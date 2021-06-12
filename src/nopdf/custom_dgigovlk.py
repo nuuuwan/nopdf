@@ -7,7 +7,7 @@ from nopdf import scrape, ocr
 
 URL = 'https://www.dgi.gov.lk/news/press-releases-sri-lanka/covid-19-documents'
 
-REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+_(?P<page_no>\d{3})_.+-page-(?P<ref_no>\d{3}).+'
+REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+(?P<ref_no>\d{3}).+-page-(?P<page_no>\d{3}).+'
 
 def custom_dgigovlk():
     """Run custom."""
@@ -19,18 +19,23 @@ def custom_dgigovlk():
         ]):
             continue
 
-        info = re.search(REGEX_MEDIA_URL, media_url).groupdict()
+        result = re.search(REGEX_MEDIA_URL, media_url)
+        if not result:
+            logging.error('Invalid URL format: %s', media_url)
+            break
+
+        info = result.groupdict()
         date = info['date'].replace('.', '')
         ref_no = info['ref_no']
         page_no = info['page_no']
 
-        base_name = '/tmp/nopdf.dgigovlk.%s.%s.%s' % (date, ref_no, page_no)
+        base_name = '/tmp/nopdf.dgigovlk.%s.ref%s.page%s' % (date, ref_no, page_no)
         text_file = '%s.txt' % (base_name)
         image_file = '%s.jpeg' % (base_name)
 
         www.download_binary(media_url, image_file)
         ocr.ocr(image_file, text_file)
-        break
+
 
 
 if __name__ == '__main__':

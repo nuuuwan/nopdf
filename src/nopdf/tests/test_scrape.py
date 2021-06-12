@@ -13,7 +13,9 @@ class TestScrape(unittest.TestCase):
 
     def test_scrape(self):
         """Test."""
-        self.assertGreater(len(scrape.scrape(TEST_URL)), 0)
+        media_list = scrape.scrape(TEST_URL)
+        self.assertGreater(len(media_list), 0)
+        self.assertIn('http', media_list[0])
 
 
 if __name__ == '__main__':

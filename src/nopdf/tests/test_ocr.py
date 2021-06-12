@@ -12,7 +12,7 @@ class TestOcr(unittest.TestCase):
 
     def test_ocr(self):
         """Test."""
-        text = ocr.ocr(TEST_IMAGE)
+        text = ocr.ocr(TEST_IMAGE, '/tmp/nopdf.ocr.test_image.txt')
         lines = text.split('\n')
         self.assertEqual(len(lines), 57)
 

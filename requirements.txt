@@ -1,0 +1,4 @@
+PIL
+pytesseract
+bs4
+utils-nuuuwan

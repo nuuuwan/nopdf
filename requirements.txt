@@ -3,3 +3,4 @@ tesseract
 pytesseract
 bs4
 utils-nuuuwan
+gig-nuuuwan

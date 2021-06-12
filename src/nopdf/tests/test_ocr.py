@@ -4,15 +4,20 @@ import unittest
 
 from nopdf import ocr
 
+TEST_IMAGE = 'src/assets/test_image.jpeg'
+
 
 class TestOcr(unittest.TestCase):
     """Tests."""
 
     def test_ocr(self):
         """Test."""
-        self.assertTrue(ocr.ocr())
+        text = ocr.ocr(TEST_IMAGE)
+        lines = text.split('\n')
+        self.assertEqual(len(lines), 57)
+
+        self.assertEqual(lines[2], 'Department of Government Information')
 
 
 if __name__ == '__main__':
     unittest.main()
-    

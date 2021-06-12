@@ -1,7 +1,12 @@
 """Ocr"""
 
+import pytesseract
 
-def ocr():
+from PIL import Image
+
+
+def ocr(image_file):
     """Run."""
-    return True
-        
+    return pytesseract.image_to_string(
+        Image.open(image_file),
+    )

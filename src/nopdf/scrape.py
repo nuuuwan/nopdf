@@ -21,5 +21,5 @@ def scrape(url):
         soup.find_all('img'),
     ))
 
-    logging.debug('Scraped %d images from %s', len(media_list), url)
+    logging.debug('Scraped %d images from %s', len(media_url_list), url)
     return media_url_list

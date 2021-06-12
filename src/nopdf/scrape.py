@@ -12,7 +12,10 @@ def scrape(url):
     html = www.read(url)
     soup = BeautifulSoup(html, 'html.parser')
     domain = urlparse(url).netloc
-    return list(map(
+    media_list = list(map(
         lambda img: 'https:/%s%s' % (domain, img.get('src')),
         soup.find_all('img'),
     ))
+
+    logging.debug('Scraped %d images from %s' % (len(media_list), url))
+    return media_list

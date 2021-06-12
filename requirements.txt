@@ -1,4 +1,5 @@
 Pillow
+tesseract
 pytesseract
 bs4
 utils-nuuuwan

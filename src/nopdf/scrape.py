@@ -1,9 +1,14 @@
 """Scrape."""
+import logging
+
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 from utils import www
 from utils.cache import cache
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 @cache('nopdf', 86400)
@@ -17,5 +22,5 @@ def scrape(url):
         soup.find_all('img'),
     ))
 
-    logging.debug('Scraped %d images from %s' % (len(media_list), url))
+    logging.debug('Scraped %d images from %s', len(media_list), url)
     return media_list

@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from utils import www
 from utils.cache import cache
 
-
 logging.basicConfig(level=logging.DEBUG)
 
 

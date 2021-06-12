@@ -1,4 +1,4 @@
-PIL
+Pillow
 pytesseract
 bs4
 utils-nuuuwan

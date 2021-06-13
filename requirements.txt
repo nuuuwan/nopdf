@@ -1,5 +1,6 @@
 Pillow
 tesseract
+tesseract-ocr
 pytesseract
 bs4
 utils-nuuuwan

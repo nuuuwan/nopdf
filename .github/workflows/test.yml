@@ -1,6 +1,6 @@
 on: workflow_dispatch
 
-jobs: 
+jobs:
   run_cmd:
     runs-on: ubuntu-latest
 
@@ -15,17 +15,22 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.7'
-        
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
+
+        sudo apt-get install tesseract-ocr libtesseract-dev libleptonica-dev pkg-config -y
+        python -m pip install --upgrade pip
+        pip install Cython
+        pip install tesserocr
+
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install build        
-    
+        pip install build
+
     - name: Run
       run: |
         export PYTHONPATH="$PYTHONPATH:./src"
         python src/nopdf/custom_dgigovlk.py
         ls /tmp/
-      

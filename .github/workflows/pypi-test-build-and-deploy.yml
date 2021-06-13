@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
 
-        apt-get install tesseract-ocr libtesseract-dev libleptonica-dev pkg-config -y
+        sudo apt-get install tesseract-ocr libtesseract-dev libleptonica-dev pkg-config -y
         python -m pip install --upgrade pip
         pip install Cython
         pip install tesserocr

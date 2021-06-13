@@ -3,6 +3,8 @@ name: Text, Build and Upload to PyPi
 
 on:
   push:
+    path:
+      setup.py
 
 jobs:
   test-build-and-deploy:

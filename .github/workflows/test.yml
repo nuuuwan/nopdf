@@ -32,8 +32,7 @@ jobs:
     - name: Run
       run: |
         export PYTHONPATH="$PYTHONPATH:./src"
-        python src/nopdf/custom_dgigovlk.py
-        ls /tmp/
+        echo 'test' > /tmp/nopdf.test.txt
 
     - name: Checkout nuuuwan/nopdf_data
       uses: actions/checkout@v2
@@ -52,8 +51,8 @@ jobs:
         echo '....'
 
         echo 'Settting git config...'
-        git config --global user.email "${{ secrets.GITHUB_USER_EMAIL }}"
-        git config --global user.name "${{ secrets.GITHUB_USER_NAME }}"
+        git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
+        git config --global user.name "${{ secrets.GIT_USER_NAME }}"
 
         echo 'Copying files...'
         cp /tmp/nopdf* .

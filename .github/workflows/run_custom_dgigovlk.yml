@@ -1,3 +1,5 @@
+name: Process https://www.dgi.gov.lk/news/press-releases-sri-lanka/covid-19-documents
+
 on:
   schedule:
     - cron: "15 * * * *"

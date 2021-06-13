@@ -329,6 +329,7 @@ def custom_dgigovlk():
         ref_to_page_to_url[ref_no][page_no] = url
 
     # extract text for each page, and collect
+    data_list = []
     for ref_no, page_to_url in sorted(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
@@ -367,9 +368,11 @@ def custom_dgigovlk():
             all_text = filex.read(all_text_file)
 
         data = _parse_ref_text(ref_no, all_text)
+        data_list.append(data)
         data_file = '%s.json' % (base_name_all)
         jsonx.write(data_file, data)
-        return data
+    logging.info('Found %d press releases.', len(data_list))
+    return data_list
 
 
 if __name__ == '__main__':

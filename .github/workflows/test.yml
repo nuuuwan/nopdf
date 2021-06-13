@@ -1,4 +1,6 @@
-on: workflow_dispatch
+on:
+  schedule:
+    - cron: "15 * * * *"
 
 jobs:
   run_cmd:

@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: nuuuwan/nopdf_data
-        token: "{{ secrets.NOPDF_DATA_TOKEN }}"
+        token: "${{ secrets.NOPDF_DATA_TOKEN }}"
 
 
     - name: Copy data

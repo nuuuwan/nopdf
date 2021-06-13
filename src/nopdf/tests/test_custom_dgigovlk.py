@@ -10,7 +10,7 @@ class TestCustomDgigovlk(unittest.TestCase):
 
     def test_custom_dgigovlk(self):
         """Test."""
-        self.assertIn('ref_no', custom_dgigovlk.custom_dgigovlk())
+        self.assertIn('ref_no', custom_dgigovlk.custom_dgigovlk()[0])
 
 
 if __name__ == '__main__':

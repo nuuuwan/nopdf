@@ -17,4 +17,7 @@ jobs:
         python-version: '3.7'
     
     - name: Run
-      run: ls
+      run: |
+        python src/nopdf/custom_dgigovlk.py
+        ls /tmp/
+      

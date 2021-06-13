@@ -81,6 +81,7 @@ IGNORE_REGEX_LIST = [
     r'Under 20 years - ol',
     r'Update',
     r'Slyw\., ed\) WRN\)',
+    r'SPywwwy > Inn',
 ]
 
 
@@ -511,10 +512,11 @@ def _render_data_list(data_list):
 
         render_uncategorized = ''
         if 'uncategorized_text_lines' in data:
+            render_uncategorized += '...'
             if len(data['uncategorized_text_lines']) > 0:
                 render_uncategorized = '\n'.join(
                     list(map(
-                        lambda line: '*%s*' % (line),
+                        lambda line: '%s' % (line),
                         data['uncategorized_text_lines'],
                     )),
                 )

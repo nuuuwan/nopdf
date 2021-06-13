@@ -3,9 +3,8 @@ name: Text, Build and Upload to PyPi
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    paths:
+      - 'setup.py'
 
 jobs:
   test-build-and-deploy:

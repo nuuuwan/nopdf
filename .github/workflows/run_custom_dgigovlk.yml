@@ -2,7 +2,7 @@ name: Process https://www.dgi.gov.lk/news/press-releases-sri-lanka/covid-19-docu
 
 on:
   schedule:
-    - cron:  "58 * * * *"
+    - cron:  "0 */4 * * *"
 
 jobs:
   run_cmd:

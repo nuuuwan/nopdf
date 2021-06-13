@@ -2,7 +2,7 @@ name: Run custom_dgigovlk - Cron
 
 on:
   schedule:
-    - cron:  "0 */1 * * *"
+    - cron:  "0 */4 * * *"
 
 jobs:
   run_cmd:

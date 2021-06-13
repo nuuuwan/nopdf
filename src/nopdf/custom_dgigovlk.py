@@ -1,7 +1,6 @@
 """CustomDgigovlk."""
 import os
 import re
-import json
 import logging
 import datetime
 
@@ -19,9 +18,9 @@ REGEX_DAY_DEATHS = r'(?P<day>\w+ \d{2})\s*-\s*(?P<deaths>\d+).*'
 REGEX_GENDER_DEATHS = r'(?P<gender>\w+ale)\s*-\s*(?P<deaths>\d+).*'
 REGEX_AGE_DEATHS = r'(?P<age>.+) [Y|y]ears\s*-\s*(?P<deaths>\d+).*'
 REGEX_PLACE_DEATHS = r'(?P<place>.*(Residence|hospital).*)\s*-' \
-    + '\s*(?P<deaths>\d+).*'
+    + r'\s*(?P<deaths>\d+).*'
 
-REGEX_DATE= r'(?P<date>\d{2}\.\d{2}\.\d{4})'
+REGEX_DATE = r'(?P<date>\d{2}\.\d{2}\.\d{4})'
 REGEX_CUM_CONFIRMED = r'Total - (?P<cum_confirmed>\d+)'
 REGEX_NEW_CONFIRMED = r'\((?P<new_confirmed>\d+) within the day\)'
 REGEX_CUM_DEATHS = r'.*otal.*deaths.* (?P<cum_deaths>\d+)\s*'
@@ -48,11 +47,11 @@ def _parse_ref_text(ref_no, text):
     area_of_residence_lines = []
     cause_of_death_lines = []
     region_data = {}
-    region_data_in = {}
+    # region_data_in = {}
     region_data_out = {}
     district_name = None
     police_area_name = None
-    while (i_line < n_lines):
+    while i_line < n_lines:
         line = lines[i_line]
         i_line += 1
         if len(line.strip()) == 0:
@@ -288,7 +287,6 @@ def _get_press_releases(url_list):
 
 def _render_data_list(data_list):
     for data in data_list:
-        print(data)
         ref_no = data['ref_no']
         base_name_all = '/tmp/nopdf.dgigovlk.ref%s' % (
             ref_no,
@@ -343,10 +341,10 @@ def _render_data_list(data_list):
         if 'deaths_py_place' in data:
             rendered_stats += '### Deaths by Place\n'
             for info in data['deaths_py_place']:
-                    rendered_stats += '* %s: %s\n' % (
-                        info['place'],
-                        str(info['deaths']),
-                    )
+                rendered_stats += '* %s: %s\n' % (
+                    info['place'],
+                    str(info['deaths']),
+                )
 
         if 'areas_of_residence' in data:
             rendered_stats += '### Area of Residence of Fatalities\n'
@@ -380,10 +378,6 @@ def _render_data_list(data_list):
                             rendered_rfi += '    * %s \n' % (
                                 area['area_name'],
                             )
-
-
-
-
         filex.write(md_file, '''
 # Press Release No. {ref_no}
 {rendered_time}
@@ -398,7 +392,6 @@ def _render_data_list(data_list):
             rendered_stats=rendered_stats,
             rendered_rfi=rendered_rfi,
         ))
-        break
 
 
 def custom_dgigovlk():
@@ -474,9 +467,6 @@ def custom_dgigovlk():
 
     logging.info('Found %d press releases.', len(data_list))
     return data_list
-
-
-
 
 
 if __name__ == '__main__':

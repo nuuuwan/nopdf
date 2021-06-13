@@ -3,8 +3,6 @@ name: Text, Build and Upload to PyPi
 
 on:
   push:
-    paths:
-      - 'setup.py'
 
 jobs:
   test-build-and-deploy:
@@ -30,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
 
-        sudo apt-get install tesseract-ocr libtesseract-dev libleptonica-dev pkg-config -y
+        apt-get install tesseract-ocr libtesseract-dev libleptonica-dev pkg-config -y
         python -m pip install --upgrade pip
         pip install Cython
         pip install tesserocr

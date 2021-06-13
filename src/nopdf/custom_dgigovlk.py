@@ -244,7 +244,7 @@ def _parse_ref_text(ref_no, text):
 
                 for area in sorted(police_data):
                     gnds = ents.get_entities_by_name_fuzzy(
-                        area,
+                        area.partition(' ')[0],
                         filter_entity_type='gnd',
                         filter_parent_id=district_id,
                     )

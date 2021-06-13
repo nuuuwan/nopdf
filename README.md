@@ -16,6 +16,12 @@ less stable):
 pip install -i https://test.pypi.org/simple/ nopdf-nuuuwan
 ```
 
+## Data
+
+Data pulled can be found in the following repos:
+
+* custom_dgigovlk: https://github.com/nuuuwan/nopdf_data
+
 ## Release History
 
 ### 1.0.0 Initial Release (PRE-RELEASE ONLY)

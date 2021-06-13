@@ -28,3 +28,4 @@ Data pulled can be found in the following repos:
 
 * custom_dgigovlk: Improved efficiency
 * custom_dgigovlk: Added Markdown summary rendering
+* custom_dgigovlk: Added New Year cluster & unstructured information

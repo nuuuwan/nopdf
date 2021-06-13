@@ -21,9 +21,67 @@ REGEX_PLACE_DEATHS = r'(?P<place>.*(Residence|hospital).*)\s*-' \
     + r'\s*(?P<deaths>\d+).*'
 
 REGEX_DATE = r'(?P<date>\d{2}\.\d{2}\.\d{4})'
-REGEX_CUM_CONFIRMED = r'Total - (?P<cum_confirmed>\d+)'
-REGEX_NEW_CONFIRMED = r'\((?P<new_confirmed>\d+) within the day\)'
+REGEX_CUM_CONF = r'Total - (?P<cum_conf>\d+)'
+REGEX_NEW_CONF = r'\((?P<new_conf>\d+) within the day\)'
 REGEX_CUM_DEATHS = r'.*otal.*deaths.* (?P<cum_deaths>\d+)\s*'
+
+REGEX_CUM_CONF_PATIENTS = r'.*atients reported.* (?P<cum_conf_patients>\d+)\s*'
+REGEX_CUM_CONF_NEW_YEAR = r'.*New Year.* (?P<cum_conf_new_year>\d+)\s*'
+
+IGNORE_REGEX_LIST = [
+    r'.*\+94.*',
+    r'.*163, Borgen.*',
+    r'.*Age Group.*',
+    r'.*Anexirenen novelas.*',
+    r'.*ce.*mbme.*',
+    r'.*cermmboe*',
+    r'.*dasenrd.*',
+    r'.*dasombd.*',
+    r'.*Divulapitiya, Peliyagoda.*',
+    r'.*Gender.*',
+    r'.*GnroeH.*',
+    r'.*Henew.*',
+    r'.*INFECTIONS REPORTED.*',
+    r'.*reported patients.*',
+    r'.*Slyww.*',
+    r'\d{4}\.\d{2}\.\d{2}',
+    r'© 163.*',
+    r'103, Ageia ney, Gar',
+    r'103, Dpexirrenen novelas, Ge',
+    r'163, Dgerrionen osetia, a,',
+    r'1g 05,4',
+    r'70-79 years - Pal',
+    r'AIFS HHUO HonowadHend',
+    r'AIFS.*',
+    r'AJF.*',
+    r'Chief Editor.*News Editor',
+    r'Department of Government Information',
+    r'Details of the deceased',
+    r'Director \(News\) / News Manage',
+    r'Director General of Government .+nformation',
+    r'Director.*News.*anager',
+    r'G00, ore 0',
+    r'Mohan Samaranayake',
+    r'No of Covid Cases',
+    r'ode .*',
+    r'odes HOassg sembmeSadqoO',
+    r'Press Release',
+    r'Pwr > Ian',
+    r'Release No: \d{3}/20\d{2}',
+    r'S2omrnry, ord\)',
+    r'Saw.*',
+    r'Say.*',
+    r'Sd.*',
+    r'Sed HbHasS.*',
+    r'Ses HOasS seembmeSes—O',
+    r'Slow, ed\)',
+    r'subject to the existing travel restrictions',
+    r'SYsFTKis.*',
+    r'SYsThs ZaHsucd Honemadsenid',
+    r'Under 20 years - ol',
+    r'Update',
+    r'Slyw\., ed\) WRN\)',
+]
 
 
 def _parse_ref_text(ref_no, text):
@@ -39,8 +97,10 @@ def _parse_ref_text(ref_no, text):
     deaths_py_place = []
     date_str = None
     time_str = None
-    cum_confirmed = None
-    new_confirmed = None
+    cum_conf = None
+    cum_conf_new_year = None
+    cum_conf_patients = None
+    new_conf = None
     cum_deaths = None
     n_lines = len(lines)
     i_line = 0
@@ -51,8 +111,10 @@ def _parse_ref_text(ref_no, text):
     region_data_out = {}
     district_name = None
     police_area_name = None
+    uncategorized_text_lines = []
+
     while i_line < n_lines:
-        line = lines[i_line]
+        line = lines[i_line].replace('¢', '').strip()
         i_line += 1
         if len(line.strip()) == 0:
             continue
@@ -67,14 +129,24 @@ def _parse_ref_text(ref_no, text):
             date_str = result.groupdict()['date']
             continue
 
-        result = re.search(REGEX_CUM_CONFIRMED, line)
+        result = re.search(REGEX_CUM_CONF, line)
         if result:
-            cum_confirmed = (int)(result.groupdict()['cum_confirmed'])
+            cum_conf = (int)(result.groupdict()['cum_conf'])
             continue
 
-        result = re.search(REGEX_NEW_CONFIRMED, line)
+        result = re.search(REGEX_CUM_CONF_NEW_YEAR, line)
         if result:
-            new_confirmed = (int)(result.groupdict()['new_confirmed'])
+            cum_conf_new_year = (int)(result.groupdict()['cum_conf_new_year'])
+            continue
+
+        result = re.search(REGEX_CUM_CONF_PATIENTS, line)
+        if result:
+            cum_conf_patients = (int)(result.groupdict()['cum_conf_patients'])
+            continue
+
+        result = re.search(REGEX_NEW_CONF, line)
+        if result:
+            new_conf = (int)(result.groupdict()['new_conf'])
             continue
 
         result = re.search(REGEX_CUM_DEATHS, line)
@@ -141,6 +213,7 @@ def _parse_ref_text(ref_no, text):
                 i_line += 1
                 if '.' in line:
                     break
+            continue
 
         if 'Causes of Death' in line:
             while True:
@@ -150,6 +223,7 @@ def _parse_ref_text(ref_no, text):
                 i_line += 1
                 if '.' in line:
                     break
+            continue
 
         if 'District' in line and len(line) < 25:
             district_name = line.replace('District', '').strip()
@@ -167,16 +241,47 @@ def _parse_ref_text(ref_no, text):
             'Scheme' in line,
             'Place' in line,
             'Division' in line,
+            'Diivision' in line,
             'Road' in line,
             'Mawatha' in line,
+            'Grama' in line,
+            'Complex' in line,
+            'Estate' in line,
+            'watta' in line,
         ]):
-            gnd_name = line.replace('e ', '').replace('\u00a2', '').strip()
+            gnd_name = line.replace('e ', '').replace('\u00a2', '')\
+                .replace('© ', '').strip()
+            gnd_name = gnd_name.replace('=', '').strip()
+            if gnd_name in [
+                'iladhari Diivision',
+                'adhari Diivision',
+                'iladhari Division',
+                'iladhari Diivision',
+                'ladhari Diivision',
+                'iladhari Diivision',
+            ]:
+                continue
             if district_name and police_area_name:
                 region_data[district_name][police_area_name].append(gnd_name)
             continue
 
         if 'released' in line:
             region_data = region_data_out
+            continue
+
+        # lines to ignore
+        do_ignore = False
+        for ignore_regex in IGNORE_REGEX_LIST:
+            if re.search(ignore_regex, line):
+                do_ignore = True
+                break
+            if len(line) < 10:
+                do_ignore = True
+                break
+        if do_ignore:
+            continue
+
+        uncategorized_text_lines.append(line)
 
     info = {'ref_no': ref_no}
     if date_str:
@@ -189,10 +294,14 @@ def _parse_ref_text(ref_no, text):
             .fromtimestamp(unixtime)\
             .strftime('%Y-%m-%d %H:%M')
 
-    if cum_confirmed:
-        info['cum_confirmed'] = cum_confirmed
-    if new_confirmed:
-        info['new_confirmed'] = new_confirmed
+    if cum_conf:
+        info['cum_conf'] = cum_conf
+    if cum_conf_new_year:
+        info['cum_conf_new_year'] = cum_conf_new_year
+    if cum_conf_patients:
+        info['cum_conf_patients'] = cum_conf_patients
+    if new_conf:
+        info['new_conf'] = new_conf
     if cum_deaths:
         info['cum_deaths'] = cum_deaths
 
@@ -271,6 +380,8 @@ def _parse_ref_text(ref_no, text):
             })
         info['released_from_isolation'] = region_data_out_formatted
 
+    if len(uncategorized_text_lines) > 0:
+        info['uncategorized_text_lines'] = uncategorized_text_lines
     return info
 
 
@@ -292,23 +403,36 @@ def _render_data_list(data_list):
             ref_no,
         )
         md_file = '%s.md' % (base_name_all)
-        if os.path.exists(md_file):
-            continue
+        # if os.path.exists(md_file):
+        #     continue
 
         rendered_time = ''
         if 'datetime' in data:
             rendered_time = '*%s*' % (data['datetime'])
 
         rendered_stats = ''
-        if 'cum_confirmed' in data:
+        if 'cum_conf' in data:
             rendered_stats += '* %s: %s\n' % (
                 'Total Confirmed Cases',
-                str(data['cum_confirmed']),
+                str(data['cum_conf']),
             )
-        if 'new_confirmed' in data:
+
+        if 'cum_conf_new_year' in data:
+            rendered_stats += '* %s: %s\n' % (
+                'Total Confirmed Cases (New Year Cluster)',
+                str(data['cum_conf_new_year']),
+            )
+
+        if 'cum_conf_patients' in data:
+            rendered_stats += '* %s: %s\n' % (
+                'Total Confirmed Cases (Not New Year Cluster)',
+                str(data['cum_conf_patients']),
+            )
+
+        if 'new_conf' in data:
             rendered_stats += '* %s: %s\n' % (
                 'New Cases',
-                str(data['new_confirmed']),
+                str(data['new_conf']),
             )
         if 'cum_deaths' in data:
             rendered_stats += '* %s: %s\n' % (
@@ -366,8 +490,9 @@ def _render_data_list(data_list):
         if 'released_from_isolation' in data:
             rendered_rfi += '## Released from Isolation\n'
             for district in data['released_from_isolation']:
-                rendered_rfi += '* %s District \n' % (
+                rendered_rfi += '* %s District (%s) \n' % (
                     district['district_name'],
+                    district['district_id'],
                 )
                 for police_area in district['police_areas']:
                     rendered_rfi += '  * %s Police Area\n' % (
@@ -378,19 +503,34 @@ def _render_data_list(data_list):
                             rendered_rfi += '    * %s \n' % (
                                 area['area_name'],
                             )
+                        if 'gnd_name' in area:
+                            rendered_rfi += '    * %s GND (%s) \n' % (
+                                area['gnd_name'],
+                                area['gnd_id'],
+                            )
+
+        render_uncategorized = ''
+        if 'uncategorized_text_lines' in data:
+            if len(data['uncategorized_text_lines']) > 0:
+                render_uncategorized = '\n'.join(
+                    list(map(
+                        lambda line: '*%s*' % (line),
+                        data['uncategorized_text_lines'],
+                    )),
+                )
+
         filex.write(md_file, '''
 # Press Release No. {ref_no}
 {rendered_time}
-
 {rendered_stats}
-
 {rendered_rfi}
-
+{render_uncategorized}
         '''.format(
             ref_no=ref_no,
             rendered_time=rendered_time,
             rendered_stats=rendered_stats,
             rendered_rfi=rendered_rfi,
+            render_uncategorized=render_uncategorized,
         ))
 
 
@@ -422,7 +562,6 @@ def custom_dgigovlk():
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
     ):
-
         base_name_all = '/tmp/nopdf.dgigovlk.ref%s' % (
             ref_no,
         )

@@ -21,5 +21,3 @@ pip install -i https://test.pypi.org/simple/ nopdf-nuuuwan
 ### 1.0.0 Initial Release (PRE-RELEASE ONLY)
 
 * ...
-
-        

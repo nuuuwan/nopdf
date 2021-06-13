@@ -27,35 +27,6 @@ REGEX_NEW_CONFIRMED = r'\((?P<new_confirmed>\d+) within the day\)'
 REGEX_CUM_DEATHS = r'.*total.*number.*COVID.*deaths.* (?P<cum_deaths>\d+)\s*'
 
 
-def _get_fuzzy_fp(entity_name):
-    fuzzy_fp = entity_name
-    fuzzy_fp = fuzzy_fp.split(' ')[0]
-    fuzzy_fp = fuzzy_fp.lower()
-    fuzzy_fp = fuzzy_fp.replace("th", 't')
-    fuzzy_fp = fuzzy_fp.replace("w", 'v')
-    fuzzy_fp = fuzzy_fp[0] + re.sub('[aeiou]', '', fuzzy_fp[1:])
-    return fuzzy_fp
-
-
-entities_index = {
-    'district': ents.get_entities('district'),
-    'gnd': ents.get_entities('gnd'),
-}
-
-
-def _fuzzy_search_entity(entity_type, search_text, parent_id=''):
-    entities = entities_index[entity_type]
-    fp_search_text = _get_fuzzy_fp(search_text)
-    for entity in entities:
-        if parent_id not in entity['id']:
-            continue
-        fp_entity = _get_fuzzy_fp(entity['name'])
-
-        if fp_entity == fp_search_text:
-            return entity
-    return None
-
-
 def _parse_ref_text(ref_no, text):
     lines = text.split('\n')
 
@@ -255,9 +226,13 @@ def _parse_ref_text(ref_no, text):
             key=lambda item: item[0],
         ):
 
-            district = _fuzzy_search_entity('district', district_name)
+            districts = ents.get_entities_by_name_fuzzy(
+                district_name,
+                filter_entity_type='district',
+            )
             district_id = ''
-            if district:
+            if districts:
+                district = districts[0]
                 district_id = district['id']
                 district_name = district['name']
 
@@ -269,8 +244,13 @@ def _parse_ref_text(ref_no, text):
                 area_data_formatted = []
 
                 for area in sorted(police_data):
-                    gnd = _fuzzy_search_entity('gnd', area, district_id)
-                    if gnd:
+                    gnds = ents.get_entities_by_name_fuzzy(
+                        area,
+                        filter_entity_type='gnd',
+                        filter_parent_id=district_id,
+                    )
+                    if gnds:
+                        gnd = gnds[0]
                         area_data_formatted.append({
                             'gnd_id': gnd['id'],
                             'gnd_name': gnd['name'],

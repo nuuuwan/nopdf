@@ -1,4 +1,5 @@
 """CustomDgigovlk."""
+import os
 import re
 import json
 import logging
@@ -17,7 +18,8 @@ REGEX_TIME = r'Time\s*:\s*(?P<time>\d+.\d{2})\s*'
 REGEX_DAY_DEATHS = r'(?P<day>\w+ \d{2})\s*-\s*(?P<deaths>\d+).*'
 REGEX_GENDER_DEATHS = r'(?P<gender>\w+ale)\s*-\s*(?P<deaths>\d+).*'
 REGEX_AGE_DEATHS = r'(?P<age>.+) [Y|y]ears\s*-\s*(?P<deaths>\d+).*'
-REGEX_PLACE_DEATHS = r'(?P<place>.*(Residence|hospital).*)\s*-\s*(?P<deaths>\d+).*'
+REGEX_PLACE_DEATHS = r'(?P<place>.*(Residence|hospital).*)\s*-' \
+    + '\s*(?P<deaths>\d+).*'
 
 REGEX_DATE= r'(?P<date>\d{2}\.\d{2}\.\d{4})'
 REGEX_CUM_CONFIRMED = r'Total - (?P<cum_confirmed>\d+)'
@@ -74,7 +76,7 @@ def _parse_ref_text(ref_no, text):
     i_line = 0
     area_of_residence_lines = []
     cause_of_death_lines = []
-    region_data = None
+    region_data = {}
     region_data_in = {}
     region_data_out = {}
     district_name = None
@@ -162,7 +164,7 @@ def _parse_ref_text(ref_no, text):
             continue
 
         if 'Area of Residence' in line:
-            while(True):
+            while True:
                 line = lines[i_line]
                 if len(line.strip()) > 0:
                     area_of_residence_lines.append(line)
@@ -171,7 +173,7 @@ def _parse_ref_text(ref_no, text):
                     break
 
         if 'Causes of Death' in line:
-            while(True):
+            while True:
                 line = lines[i_line]
                 if len(line.strip()) > 0:
                     cause_of_death_lines.append(line)
@@ -205,8 +207,6 @@ def _parse_ref_text(ref_no, text):
 
         if 'released' in line:
             region_data = region_data_out
-
-        print('- ', line)
 
     info = {'ref_no': ref_no}
     if date_str:
@@ -332,38 +332,44 @@ def custom_dgigovlk():
     for ref_no, page_to_url in sorted(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
-    )[15:16]:
-        # all_text = ''
-        # for page_no, url in sorted(
-        #     page_to_url.items(),
-        #     key=lambda item: item[0],
-        # ):
-        #
-        #     base_name = '/tmp/nopdf.dgigovlk.ref%s.page%s' % (
-        #         ref_no,
-        #         page_no,
-        #     )
-        #     text_file = '%s.txt' % (base_name)
-        #     image_file = '%s.jpeg' % (base_name)
-        #
-        #     www.download_binary(url, image_file)
-        #     text = ocr.ocr(image_file, text_file)
-        #     # text = filex.read(text_file)
-        #
-        #     all_text += text
+    ):
 
         base_name_all = '/tmp/nopdf.dgigovlk.ref%s' % (
             ref_no,
         )
         all_text_file = '%s.txt' % (base_name_all)
-        # filex.write(all_text_file, all_text)
-        all_text = filex.read(all_text_file)
+
+        if not os.path.exists(all_text_file):
+            all_text = ''
+            for page_no, url in sorted(
+                page_to_url.items(),
+                key=lambda item: item[0],
+            ):
+
+                base_name = '/tmp/nopdf.dgigovlk.ref%s.page%s' % (
+                    ref_no,
+                    page_no,
+                )
+                image_file = '%s.jpeg' % (base_name)
+
+                if not os.path.exists(image_file):
+                    www.download_binary(url, image_file)
+
+                text_file = '%s.txt' % (base_name)
+                if not os.path.exists(text_file):
+                    text = ocr.ocr(image_file, text_file)
+                else:
+                    text = filex.read(text_file)
+
+                all_text += text
+            filex.write(all_text_file, all_text)
+        else:
+            all_text = filex.read(all_text_file)
 
         data = _parse_ref_text(ref_no, all_text)
-        print('...')
-        print(json.dumps(data, indent=2))
         data_file = '%s.json' % (base_name_all)
         jsonx.write(data_file, data)
+        return data
 
 
 if __name__ == '__main__':

@@ -16,38 +16,35 @@ jobs:
       with:
         python-version: '3.7'
 
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest
 
+        sudo apt-get install tesseract-ocr libtesseract-dev libleptonica-dev pkg-config -y
+        python -m pip install --upgrade pip
+        pip install Cython
+        pip install tesserocr
+
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install build
 
     - name: Run
       run: |
         export PYTHONPATH="$PYTHONPATH:./src"
-        echo 'test' > /tmp/nopdf.test.txt
+        python src/nopdf/custom_dgigovlk.py
 
-    - name: Checkout nuuuwan/nopdf_data
+    - name: Checkout nopdf_data
       uses: actions/checkout@v2
       with:
         repository: nuuuwan/nopdf_data
-        token: "${{ secrets.NOPDF_DATA_TOKEN }}"
+        token: "${{ secrets.NOPDF_DATA_TOKEN}}"
 
-
-    - name: Copy data
+    - name: Copy data, and push to nopdf_data
       run: |
-        echo '....'
-        echo 'Running: ls'
-        ls
-        echo '....'
-        echo 'Running: ls /tmp/'
-        ls /tmp/nopdf*
-        echo '....'
-
-        echo 'Settting git config...'
         git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
         git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-
-        echo 'Copying files...'
         cp /tmp/nopdf* .
-
-        echo 'Git add, commit and push...'
         git add .
         git commit -m "Added new data"
         git push origin main

@@ -10,6 +10,7 @@ from gig import ents
 from nopdf import scrape, ocr
 
 URL = 'https://www.dgi.gov.lk/news/press-releases-sri-lanka/covid-19-documents'
+GITHUB_URL = 'https://github.com/nuuuwan/nopdf_data/blob/main'
 
 REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+' \
     + r'(?P<ref_no>\d{3}).+-page-(?P<page_no>\d{3}).+'
@@ -536,7 +537,10 @@ def _render_data_list(data_list):
         ))
 
 
-def custom_dgigovlk():
+def custom_dgigovlk(
+    force_image_redownload=False,
+    force_information_extraction=False,
+):
     """Run custom."""
     # get press release image urls
     media_url_list = scrape.scrape(URL)
@@ -575,12 +579,25 @@ def custom_dgigovlk():
                 page_to_url.items(),
                 key=lambda item: item[0],
             ):
-
-                base_name = '/tmp/nopdf.dgigovlk.ref%s.page%s' % (
+                ref_name = 'nopdf.dgigovlk.ref%s.page%s' % (
                     ref_no,
                     page_no,
                 )
+                base_name = '/tmp/%s' % (
+                    ref_name
+                )
                 image_file = '%s.jpeg' % (base_name)
+
+                if not force_image_redownload:
+                    github_image_url = '%s/%s.jpeg' % (GITHUB_URL, ref_name)
+                    image_exists = www.exists(github_image_url)
+                    logging.debug(
+                        '%s exists: %s',
+                        github_image_url,
+                        str(image_exists)
+                    )
+                    if image_exists:
+                        continue
 
                 if not os.path.exists(image_file):
                     www.download_binary(url, image_file)
@@ -597,7 +614,7 @@ def custom_dgigovlk():
             all_text = filex.read(all_text_file)
 
         data_file = '%s.json' % (base_name_all)
-        if not os.path.exists(data_file):
+        if not os.path.exists(data_file) or force_information_extraction:
             data = _parse_ref_text(ref_no, all_text)
             jsonx.write(data_file, data)
         else:
@@ -611,4 +628,7 @@ def custom_dgigovlk():
 
 
 if __name__ == '__main__':
-    custom_dgigovlk()
+    custom_dgigovlk(
+        force_image_redownload=False,
+        force_information_extraction=False,
+    )

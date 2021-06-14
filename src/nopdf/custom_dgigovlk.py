@@ -610,5 +610,5 @@ def custom_dgigovlk(
 
 if __name__ == '__main__':
     custom_dgigovlk(
-        force_source_redownload=True,
+        force_source_redownload=False,
     )

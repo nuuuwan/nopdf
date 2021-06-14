@@ -10,7 +10,7 @@ from gig import ents
 from nopdf import scrape, ocr
 
 URL = 'https://www.dgi.gov.lk/news/press-releases-sri-lanka/covid-19-documents'
-GITHUB_URL = 'https://github.com/nuuuwan/nopdf_data/blob/main'
+GITHUB_URL = 'https://raw.githubusercontent.com/nuuuwan/nopdf_data/main'
 
 REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+' \
     + r'(?P<ref_no>\d{3}).+-page-(?P<page_no>\d{3}).+'
@@ -398,147 +398,143 @@ def _get_press_releases(url_list):
     return list(filter(_is_press_release, url_list))
 
 
-def _render_data_list(data_list):
-    for data in data_list:
-        ref_no = data['ref_no']
-        base_name_all = '/tmp/nopdf.dgigovlk.ref%s' % (
-            ref_no,
+def _render_data_list(data):
+    ref_no = data['ref_no']
+    ref_name_all = 'nopdf.dgigovlk.ref%s' % (
+        ref_no,
+    )
+    md_file = '/tmp/%s.md' % (ref_name_all)
+    rendered_time = ''
+    if 'datetime' in data:
+        rendered_time = '*%s*' % (data['datetime'])
+
+    rendered_stats = ''
+    if 'cum_conf' in data:
+        rendered_stats += '* %s: %s\n' % (
+            'Total Confirmed Cases',
+            str(data['cum_conf']),
         )
-        md_file = '%s.md' % (base_name_all)
-        # if os.path.exists(md_file):
-        #     continue
 
-        rendered_time = ''
-        if 'datetime' in data:
-            rendered_time = '*%s*' % (data['datetime'])
+    if 'cum_conf_new_year' in data:
+        rendered_stats += '* %s: %s\n' % (
+            'Total Confirmed Cases (New Year Cluster)',
+            str(data['cum_conf_new_year']),
+        )
 
-        rendered_stats = ''
-        if 'cum_conf' in data:
+    if 'cum_conf_patients' in data:
+        rendered_stats += '* %s: %s\n' % (
+            'Total Confirmed Cases (Not New Year Cluster)',
+            str(data['cum_conf_patients']),
+        )
+
+    if 'new_conf' in data:
+        rendered_stats += '* %s: %s\n' % (
+            'New Cases',
+            str(data['new_conf']),
+        )
+    if 'cum_deaths' in data:
+        rendered_stats += '* %s: %s\n' % (
+            'Total Deaths',
+            str(data['cum_deaths']),
+        )
+    if 'deaths_by_day' in data:
+        rendered_stats += '### Deaths by Day\n'
+        for info in data['deaths_by_day']:
             rendered_stats += '* %s: %s\n' % (
-                'Total Confirmed Cases',
-                str(data['cum_conf']),
+                info['date'],
+                str(info['deaths']),
+            )
+    if 'deaths_by_gender' in data:
+        rendered_stats += '### Deaths by Gender\n'
+        for info in data['deaths_by_gender']:
+            rendered_stats += '* %s: %s\n' % (
+                info['gender'],
+                str(info['deaths']),
+            )
+    if 'deaths_by_age' in data:
+        rendered_stats += '### Deaths by Age Group\n'
+        for info in data['deaths_by_age']:
+            rendered_stats += '* %s to %s: %s\n' % (
+                str(info['age_range'][0]),
+                str(info['age_range'][1]),
+                str(info['deaths']),
             )
 
-        if 'cum_conf_new_year' in data:
+    if 'deaths_py_place' in data:
+        rendered_stats += '### Deaths by Place\n'
+        for info in data['deaths_py_place']:
             rendered_stats += '* %s: %s\n' % (
-                'Total Confirmed Cases (New Year Cluster)',
-                str(data['cum_conf_new_year']),
+                info['place'],
+                str(info['deaths']),
             )
 
-        if 'cum_conf_patients' in data:
-            rendered_stats += '* %s: %s\n' % (
-                'Total Confirmed Cases (Not New Year Cluster)',
-                str(data['cum_conf_patients']),
+    if 'areas_of_residence' in data:
+        rendered_stats += '### Area of Residence of Fatalities\n'
+        for area in data['areas_of_residence']:
+            rendered_stats += '* %s\n' % (
+                area,
+            )
+    if 'causes_of_death_lines' in data:
+        rendered_stats += '### Cause of Death\n'
+        for cause in data['causes_of_death_lines']:
+            rendered_stats += '* %s\n' % (
+                cause,
             )
 
-        if 'new_conf' in data:
-            rendered_stats += '* %s: %s\n' % (
-                'New Cases',
-                str(data['new_conf']),
+    if rendered_stats:
+        rendered_stats = '## Statistics\n%s' % (rendered_stats)
+
+    rendered_rfi = ''
+    if 'released_from_isolation' in data:
+        rendered_rfi += '## Released from Isolation\n'
+        for district in data['released_from_isolation']:
+            rendered_rfi += '* %s District (%s) \n' % (
+                district['district_name'],
+                district['district_id'],
             )
-        if 'cum_deaths' in data:
-            rendered_stats += '* %s: %s\n' % (
-                'Total Deaths',
-                str(data['cum_deaths']),
+            for police_area in district['police_areas']:
+                rendered_rfi += '  * %s Police Area\n' % (
+                    police_area['police_area_name'],
+                )
+                for area in police_area['areas']:
+                    if 'area_name' in area:
+                        rendered_rfi += '    * %s \n' % (
+                            area['area_name'],
+                        )
+                    if 'gnd_name' in area:
+                        rendered_rfi += '    * %s GND (%s) \n' % (
+                            area['gnd_name'],
+                            area['gnd_id'],
+                        )
+
+    render_uncategorized = ''
+    if 'uncategorized_text_lines' in data:
+        render_uncategorized += '...'
+        if len(data['uncategorized_text_lines']) > 0:
+            render_uncategorized = '\n'.join(
+                list(map(
+                    lambda line: '%s' % (line),
+                    data['uncategorized_text_lines'],
+                )),
             )
-        if 'deaths_by_day' in data:
-            rendered_stats += '### Deaths by Day\n'
-            for info in data['deaths_by_day']:
-                rendered_stats += '* %s: %s\n' % (
-                    info['date'],
-                    str(info['deaths']),
-                )
-        if 'deaths_by_gender' in data:
-            rendered_stats += '### Deaths by Gender\n'
-            for info in data['deaths_by_gender']:
-                rendered_stats += '* %s: %s\n' % (
-                    info['gender'],
-                    str(info['deaths']),
-                )
-        if 'deaths_by_age' in data:
-            rendered_stats += '### Deaths by Age Group\n'
-            for info in data['deaths_by_age']:
-                rendered_stats += '* %s to %s: %s\n' % (
-                    str(info['age_range'][0]),
-                    str(info['age_range'][1]),
-                    str(info['deaths']),
-                )
 
-        if 'deaths_py_place' in data:
-            rendered_stats += '### Deaths by Place\n'
-            for info in data['deaths_py_place']:
-                rendered_stats += '* %s: %s\n' % (
-                    info['place'],
-                    str(info['deaths']),
-                )
-
-        if 'areas_of_residence' in data:
-            rendered_stats += '### Area of Residence of Fatalities\n'
-            for area in data['areas_of_residence']:
-                rendered_stats += '* %s\n' % (
-                    area,
-                )
-        if 'causes_of_death_lines' in data:
-            rendered_stats += '### Cause of Death\n'
-            for cause in data['causes_of_death_lines']:
-                rendered_stats += '* %s\n' % (
-                    cause,
-                )
-
-        if rendered_stats:
-            rendered_stats = '## Statistics\n%s' % (rendered_stats)
-
-        rendered_rfi = ''
-        if 'released_from_isolation' in data:
-            rendered_rfi += '## Released from Isolation\n'
-            for district in data['released_from_isolation']:
-                rendered_rfi += '* %s District (%s) \n' % (
-                    district['district_name'],
-                    district['district_id'],
-                )
-                for police_area in district['police_areas']:
-                    rendered_rfi += '  * %s Police Area\n' % (
-                        police_area['police_area_name'],
-                    )
-                    for area in police_area['areas']:
-                        if 'area_name' in area:
-                            rendered_rfi += '    * %s \n' % (
-                                area['area_name'],
-                            )
-                        if 'gnd_name' in area:
-                            rendered_rfi += '    * %s GND (%s) \n' % (
-                                area['gnd_name'],
-                                area['gnd_id'],
-                            )
-
-        render_uncategorized = ''
-        if 'uncategorized_text_lines' in data:
-            render_uncategorized += '...'
-            if len(data['uncategorized_text_lines']) > 0:
-                render_uncategorized = '\n'.join(
-                    list(map(
-                        lambda line: '%s' % (line),
-                        data['uncategorized_text_lines'],
-                    )),
-                )
-
-        filex.write(md_file, '''
+    filex.write(md_file, '''
 # Press Release No. {ref_no}
 {rendered_time}
 {rendered_stats}
 {rendered_rfi}
 {render_uncategorized}
-        '''.format(
-            ref_no=ref_no,
-            rendered_time=rendered_time,
-            rendered_stats=rendered_stats,
-            rendered_rfi=rendered_rfi,
-            render_uncategorized=render_uncategorized,
-        ))
+    '''.format(
+        ref_no=ref_no,
+        rendered_time=rendered_time,
+        rendered_stats=rendered_stats,
+        rendered_rfi=rendered_rfi,
+        render_uncategorized=render_uncategorized,
+    ))
 
 
 def custom_dgigovlk(
-    force_image_redownload=False,
+    force_source_redownload=False,
 ):
     """Run custom."""
     # get press release image urls
@@ -561,66 +557,52 @@ def custom_dgigovlk(
             ref_to_page_to_url[ref_no] = {}
         ref_to_page_to_url[ref_no][page_no] = url
 
-    # extract text for each page, and collect
     data_list = []
     for ref_no, page_to_url in sorted(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
     ):
-        base_name_all = '/tmp/nopdf.dgigovlk.ref%s' % (
+        ref_name_all = 'nopdf.dgigovlk.ref%s' % (
             ref_no,
         )
-        all_text_file = '%s.txt' % (base_name_all)
+        all_text_file = '/tmp/%s.txt' % (ref_name_all)
+        github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_name_all)
 
         if not os.path.exists(all_text_file):
-            all_text = ''
-            for page_no, url in sorted(
-                page_to_url.items(),
-                key=lambda item: item[0],
-            ):
-                ref_name = 'nopdf.dgigovlk.ref%s.page%s' % (
-                    ref_no,
-                    page_no,
-                )
-                base_name = '/tmp/%s' % (
-                    ref_name
-                )
-                image_file = '%s.jpeg' % (base_name)
-
-                if not force_image_redownload:
-                    github_image_url = '%s/%s.jpeg' % (GITHUB_URL, ref_name)
-                    image_exists = www.exists(github_image_url)
-                    logging.debug(
-                        '%s exists: %s',
-                        github_image_url,
-                        str(image_exists)
+            if not force_source_redownload \
+                and www.exists(github_text_url):
+                all_text = www.read(github_text_url)
+                logging.debug('%s exists.', github_text_url)
+            else:
+                all_text = ''
+                for page_no, url in sorted(
+                    page_to_url.items(),
+                    key=lambda item: item[0],
+                ):
+                    ref_name = 'nopdf.dgigovlk.ref%s.page%s' % (
+                        ref_no,
+                        page_no,
                     )
-                    if image_exists:
-                        continue
+                    image_file = '/tmp/%s.jpeg' % (ref_name)
+                    if not os.path.exists(image_file):
+                        www.download_binary(url, image_file)
 
-                if not os.path.exists(image_file):
-                    www.download_binary(url, image_file)
+                    text_file = '/tmp/%s.txt' % (ref_name)
+                    if not os.path.exists(text_file):
+                        text = ocr.ocr(image_file, text_file)
+                    else:
+                        text = filex.read(text_file)
 
-                text_file = '%s.txt' % (base_name)
-                if not os.path.exists(text_file):
-                    text = ocr.ocr(image_file, text_file)
-                else:
-                    text = filex.read(text_file)
-
-                all_text += text
-            filex.write(all_text_file, all_text)
+                    all_text += text
+                filex.write(all_text_file, all_text)
         else:
             all_text = filex.read(all_text_file)
 
-        data_file = '%s.json' % (base_name_all)
-        if not os.path.exists(data_file):
-            data = _parse_ref_text(ref_no, all_text)
-            jsonx.write(data_file, data)
-        else:
-            data = jsonx.read(data_file)
+        data_file = '/tmp/%s.json' % (ref_name_all)
+        data = _parse_ref_text(ref_no, all_text)
+        jsonx.write(data_file, data)
         data_list.append(data)
-
-    _render_data_list(data_list)
+        _render_data_list(data)
 
     logging.info('Found %d press releases.', len(data_list))
     return data_list
@@ -628,5 +610,5 @@ def custom_dgigovlk(
 
 if __name__ == '__main__':
     custom_dgigovlk(
-        force_image_redownload=False,
+        force_source_redownload=True,
     )

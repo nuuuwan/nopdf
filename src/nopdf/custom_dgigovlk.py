@@ -539,7 +539,6 @@ def _render_data_list(data_list):
 
 def custom_dgigovlk(
     force_image_redownload=False,
-    force_information_extraction=False,
 ):
     """Run custom."""
     # get press release image urls
@@ -614,7 +613,7 @@ def custom_dgigovlk(
             all_text = filex.read(all_text_file)
 
         data_file = '%s.json' % (base_name_all)
-        if not os.path.exists(data_file) or force_information_extraction:
+        if not os.path.exists(data_file):
             data = _parse_ref_text(ref_no, all_text)
             jsonx.write(data_file, data)
         else:
@@ -630,5 +629,4 @@ def custom_dgigovlk(
 if __name__ == '__main__':
     custom_dgigovlk(
         force_image_redownload=False,
-        force_information_extraction=False,
     )

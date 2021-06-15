@@ -8,8 +8,12 @@ from utils import filex, www, timex, jsonx
 from gig import ents
 
 from nopdf import scrape, ocr
-from nopdf.custom_dgigovlk_covid19.render_markdown import render_markdown
-from nopdf.custom_dgigovlk_covid19.parse_text import parse_text
+
+from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix
+from nopdf.custom_dgigovlk_covid19.render_data_as_markdown \
+    import render_data_as_markdown
+from nopdf.custom_dgigovlk_covid19.parse_text_and_save_data \
+    import parse_text_and_save_data
 
 URL = 'https://www.dgi.gov.lk/news/press-releases-sri-lanka/covid-19-documents'
 GITHUB_URL = 'https://raw.githubusercontent.com/nuuuwan/nopdf_data/main'
@@ -17,7 +21,7 @@ REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+' \
     + r'(?P<ref_no>\d{3}).+-page-(?P<page_no>\d{3}).+'
 
 
-def _get_press_releases(url_list):
+def _filter_press_releases(url_list):
 
     def _is_press_release(url):
         return any([
@@ -28,17 +32,17 @@ def _get_press_releases(url_list):
     return list(filter(_is_press_release, url_list))
 
 
-def custom_dgigovlk(
-    force_source_redownload=False,
-):
-    """Run custom."""
-    # get press release image urls
+def _get_image_urls():
+    logging.debug('Scraping %s for urls', URL)
     media_url_list = scrape.scrape(URL)
-    press_release_url_list = _get_press_releases(media_url_list)
+    image_urls = _filter_press_releases(media_url_list)
+    logging.debug('Found %d press-release urls', len(image_urls))
+    return image_urls
 
-    # group images by ref and page
+
+def group_images_by_ref_and_page(image_urls):
     ref_to_page_to_url = {}
-    for url in press_release_url_list:
+    for url in image_urls:
         result = re.search(REGEX_MEDIA_URL, url)
         if not result:
             logging.error('Invalid URL format: %s', url)
@@ -51,17 +55,28 @@ def custom_dgigovlk(
         if ref_no not in ref_to_page_to_url:
             ref_to_page_to_url[ref_no] = {}
         ref_to_page_to_url[ref_no][page_no] = url
+    logging.debug(
+        'Found %d press-releases.',
+        len(ref_to_page_to_url.keys()),
+    )
+    return ref_to_page_to_url
+
+
+def custom_dgigovlk(
+    force_source_redownload=False,
+):
+    """Run custom."""
+    image_urls = _get_image_urls()
+    ref_to_page_to_url = group_images_by_ref_and_page(image_urls)
 
     data_list = []
     for ref_no, page_to_url in sorted(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
     ):
-        ref_name_all = 'nopdf.dgigovlk.ref%s' % (
-            ref_no,
-        )
-        all_text_file = '/tmp/%s.txt' % (ref_name_all)
-        github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_name_all)
+        ref_prefix = _get_ref_prefix(ref_no)
+        all_text_file = '/tmp/%s.txt' % (ref_prefix)
+        github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_prefix)
 
         if not os.path.exists(all_text_file):
             if not force_source_redownload \
@@ -93,11 +108,11 @@ def custom_dgigovlk(
         else:
             all_text = filex.read(all_text_file)
 
-        data_file = '/tmp/%s.json' % (ref_name_all)
-        data = parse_text(ref_no, all_text)
+        data_file = '/tmp/%s.json' % (ref_prefix)
+        data = parse_text_and_save_data(ref_no, all_text)
         jsonx.write(data_file, data)
         data_list.append(data)
-        render_markdown(data)
+        render_data_as_markdown(data)
 
     logging.info('Found %d press releases.', len(data_list))
     return data_list

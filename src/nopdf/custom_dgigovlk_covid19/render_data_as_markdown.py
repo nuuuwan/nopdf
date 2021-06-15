@@ -1,14 +1,13 @@
 """Render data as markdown."""
 from utils import filex
 
+from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix
 
-def render_markdown(data):
+
+def render_data_as_markdown(data):
     """Render data as markdown."""
     ref_no = data['ref_no']
-    ref_name_all = 'nopdf.dgigovlk.ref%s' % (
-        ref_no,
-    )
-    md_file = '/tmp/%s.md' % (ref_name_all)
+
     rendered_time = ''
     if 'datetime' in data:
         rendered_time = '*%s*' % (data['datetime'])
@@ -123,6 +122,8 @@ def render_markdown(data):
                 )),
             )
 
+    ref_prefix = _get_ref_prefix(ref_no)
+    md_file = '/tmp/%s.md' % (ref_prefix)
     filex.write(md_file, '''
 # Press Release No. {ref_no}
 {rendered_time}
@@ -136,3 +137,4 @@ def render_markdown(data):
         rendered_rfi=rendered_rfi,
         render_uncategorized=render_uncategorized,
     ))
+    logging.debug('Saved %s' % md_file)

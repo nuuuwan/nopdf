@@ -3,10 +3,11 @@
 import re
 import datetime
 
-from utils import timex
+from utils import timex, jsonx
 from gig import ents
 
 from nopdf.custom_dgigovlk_covid19.IGNORE_REGEX_LIST import IGNORE_REGEX_LIST
+from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix
 
 from nopdf.custom_dgigovlk_covid19.constants_re import \
     REGEX_AGE_DEATHS, REGEX_CUM_CONF_NEW_YEAR, \
@@ -15,7 +16,7 @@ from nopdf.custom_dgigovlk_covid19.constants_re import \
     REGEX_NEW_CONF, REGEX_PLACE_DEATHS, REGEX_TIME
 
 
-def parse_text(ref_no, text):
+def parse_text_and_save_data(ref_no, text):
     """Parse text."""
     lines = text.split('\n')
 
@@ -315,4 +316,8 @@ def parse_text(ref_no, text):
 
     if len(uncategorized_text_lines) > 0:
         info['uncategorized_text_lines'] = uncategorized_text_lines
+
+    ref_prefix = _get_ref_prefix(ref_no)
+    data_file = '/tmp/%s.json' % (ref_prefix)
+    jsonx.write(data_file, info)
     return info

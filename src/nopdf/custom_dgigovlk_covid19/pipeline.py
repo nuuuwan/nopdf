@@ -98,13 +98,10 @@ def custom_dgigovlk():
     for ref_no, page_to_url in sorted(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
-    )[:-2]:
+    ):
         ref_prefix = _get_ref_prefix(ref_no)
 
-        all_text_file = '/tmp/%s.txt' % (ref_prefix)
-        all_text = filex.read(all_text_file)
-
-        # all_text = _download_text_from_github(ref_no)
+        all_text = _download_text_from_github(ref_no)
 
         if not all_text:
             all_text = ''

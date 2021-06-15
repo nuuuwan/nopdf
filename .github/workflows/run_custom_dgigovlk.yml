@@ -34,7 +34,7 @@ jobs:
     - name: Run
       run: |
         export PYTHONPATH="$PYTHONPATH:./src"
-        python src/nopdf/custom_dgigovlk.py
+        python src/nopdf/custom_dgigovlk_covid19/pipeline.py
 
     - name: Checkout nopdf_data
       uses: actions/checkout@v2

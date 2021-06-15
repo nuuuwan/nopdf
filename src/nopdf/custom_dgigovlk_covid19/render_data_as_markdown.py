@@ -137,4 +137,4 @@ def render_data_as_markdown(data):
         rendered_rfi=rendered_rfi,
         render_uncategorized=render_uncategorized,
     ))
-    log.debug('%s: Saved rendered data as markdown', ref_no)
+    log.info('%s: Saved rendered data as markdown', ref_no)

@@ -30,10 +30,10 @@ def _filter_press_releases(url_list):
 
 
 def _get_image_urls():
-    log.debug('Scraping %s for urls', URL)
+    log.info('Scraping %s for urls', URL)
     media_url_list = scrape.scrape(URL)
     image_urls = _filter_press_releases(media_url_list)
-    log.debug('Found %d press-release urls', len(image_urls))
+    log.info('Found %d press-release images', len(image_urls))
     return image_urls
 
 
@@ -52,7 +52,7 @@ def group_images_by_ref_and_page(image_urls):
         if ref_no not in ref_to_page_to_url:
             ref_to_page_to_url[ref_no] = {}
         ref_to_page_to_url[ref_no][page_no] = url
-    log.debug(
+    log.info(
         'Found %d press-releases.',
         len(ref_to_page_to_url.keys()),
     )
@@ -64,9 +64,9 @@ def _download_text_from_github(ref_no):
     github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_prefix)
     if www.exists(github_text_url):
         all_text = www.read(github_text_url)
-        log.debug('%s: Downloaded from GitHub.', ref_no)
+        log.info('%s: Downloaded from GitHub.', ref_no)
         return all_text
-    log.debug('%s: Not on GitHub.', ref_no)
+    log.info('%s: Not on GitHub.', ref_no)
     return None
 
 
@@ -90,17 +90,17 @@ def custom_dgigovlk():
             ):
                 image_file = '/tmp/%s.jpeg' % (ref_prefix)
                 www.download_binary(url, image_file)
-                log.debug('%s: Downloaded image - page %d', ref_no, page_no)
+                log.info('%s: Downloaded image - page %s', ref_no, page_no)
 
                 text_file = '/tmp/%s.txt' % (ref_prefix)
                 text = ocr.ocr(image_file, text_file)
-                log.debug('%s: OCRed text - page %d', ref_no, page_no)
+                log.info('%s: OCRed text - page %s', ref_no, page_no)
 
                 all_text += text
 
             all_text_file = '/tmp/%s.txt' % (ref_prefix)
             filex.write(all_text_file, all_text)
-            log.debug('%s: Wrote all text', ref_no)
+            log.info('%s: Wrote all text', ref_no)
 
         data = parse_text_and_save_data(ref_no, all_text)
         data_list.append(data)

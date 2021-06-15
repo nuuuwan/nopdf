@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from utils import www
 from utils.cache import cache
 
-logging.basicConfig(level=logging.DEBUG)
+log.basicConfig(level=log.DEBUG)
 
 
 @cache('nopdf', 3600)
@@ -21,5 +21,5 @@ def scrape(url):
         soup.find_all('img'),
     ))
 
-    logging.debug('Scraped %d images from %s', len(media_url_list), url)
+    log.debug('Scraped %d images from %s', len(media_url_list), url)
     return media_url_list

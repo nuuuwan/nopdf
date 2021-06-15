@@ -4,7 +4,7 @@ import pytesseract
 
 from PIL import Image
 
-logging.basicConfig(level=logging.DEBUG)
+log.basicConfig(level=log.DEBUG)
 
 
 def ocr(image_file, text_file):
@@ -16,5 +16,5 @@ def ocr(image_file, text_file):
     with open(text_file, 'w') as fout:
         fout.write(text)
         fout.close()
-    logging.debug('Wrote %dB to %s', len(text), text_file)
+    log.debug('Wrote %dB to %s', len(text), text_file)
     return text

@@ -1,20 +1,21 @@
 """Parse text."""
 
 import re
-import logging
 import datetime
 
 from utils import timex, jsonx
 from gig import ents
 
 from nopdf.custom_dgigovlk_covid19.IGNORE_REGEX_LIST import IGNORE_REGEX_LIST
-from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix
+from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
 
 from nopdf.custom_dgigovlk_covid19.constants_re import \
     REGEX_AGE_DEATHS, REGEX_CUM_CONF_NEW_YEAR, \
     REGEX_CUM_CONF_PATIENTS, REGEX_CUM_CONF, REGEX_CUM_DEATHS, \
     REGEX_DATE, REGEX_DAY_DEATHS, REGEX_GENDER_DEATHS, \
     REGEX_NEW_CONF, REGEX_PLACE_DEATHS, REGEX_TIME
+
+
 
 
 def parse_text_and_save_data(ref_no, text):
@@ -321,5 +322,5 @@ def parse_text_and_save_data(ref_no, text):
     ref_prefix = _get_ref_prefix(ref_no)
     data_file = '/tmp/%s.json' % (ref_prefix)
     jsonx.write(data_file, info)
-    logging.debug('%s: Saved parsed text as data', ref_no)
+    log.debug('%s: Saved parsed text as data', ref_no)
     return info

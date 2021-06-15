@@ -1,7 +1,6 @@
 """CustomDgigovlk."""
 import os
 import re
-import logging
 import datetime
 
 from utils import filex, www, timex, jsonx
@@ -9,7 +8,7 @@ from gig import ents
 
 from nopdf import scrape, ocr
 
-from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix
+from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
 from nopdf.custom_dgigovlk_covid19.render_data_as_markdown \
     import render_data_as_markdown
 from nopdf.custom_dgigovlk_covid19.parse_text_and_save_data \
@@ -22,21 +21,19 @@ REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+' \
 
 
 def _filter_press_releases(url_list):
-
     def _is_press_release(url):
         return any([
             'Press_Release' in url,
             'PR_' in url,
         ])
-
     return list(filter(_is_press_release, url_list))
 
 
 def _get_image_urls():
-    logging.debug('Scraping %s for urls', URL)
+    log.debug('Scraping %s for urls', URL)
     media_url_list = scrape.scrape(URL)
     image_urls = _filter_press_releases(media_url_list)
-    logging.debug('Found %d press-release urls', len(image_urls))
+    log.debug('Found %d press-release urls', len(image_urls))
     return image_urls
 
 
@@ -45,7 +42,7 @@ def group_images_by_ref_and_page(image_urls):
     for url in image_urls:
         result = re.search(REGEX_MEDIA_URL, url)
         if not result:
-            logging.error('Invalid URL format: %s', url)
+            log.error('Invalid URL format: %s', url)
             continue
 
         info = result.groupdict()
@@ -55,7 +52,7 @@ def group_images_by_ref_and_page(image_urls):
         if ref_no not in ref_to_page_to_url:
             ref_to_page_to_url[ref_no] = {}
         ref_to_page_to_url[ref_no][page_no] = url
-    logging.debug(
+    log.debug(
         'Found %d press-releases.',
         len(ref_to_page_to_url.keys()),
     )
@@ -67,9 +64,9 @@ def _download_text_from_github(ref_no):
     github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_prefix)
     if www.exists(github_text_url):
         all_text = www.read(github_text_url)
-        logging.debug('%s: Downloaded from GitHub.', ref_no)
+        log.debug('%s: Downloaded from GitHub.', ref_no)
         return all_text
-    logging.debug('%s: Not on GitHub.', ref_no)
+    log.debug('%s: Not on GitHub.', ref_no)
     return None
 
 
@@ -93,17 +90,17 @@ def custom_dgigovlk():
             ):
                 image_file = '/tmp/%s.jpeg' % (ref_prefix)
                 www.download_binary(url, image_file)
-                logging.debug('%s: Downloaded image - page %d', ref_no, page_no)
+                log.debug('%s: Downloaded image - page %d', ref_no, page_no)
 
                 text_file = '/tmp/%s.txt' % (ref_prefix)
                 text = ocr.ocr(image_file, text_file)
-                logging.debug('%s: OCRed text - page %d', ref_no, page_no)
+                log.debug('%s: OCRed text - page %d', ref_no, page_no)
 
                 all_text += text
 
             all_text_file = '/tmp/%s.txt' % (ref_prefix)
             filex.write(all_text_file, all_text)
-            logging.debug('%s: Wrote all text', ref_no)
+            log.debug('%s: Wrote all text', ref_no)
 
         data = parse_text_and_save_data(ref_no, all_text)
         data_list.append(data)

@@ -1,4 +1,6 @@
 """Render data as markdown."""
+import logging
+
 from utils import filex
 
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix
@@ -137,4 +139,4 @@ def render_data_as_markdown(data):
         rendered_rfi=rendered_rfi,
         render_uncategorized=render_uncategorized,
     ))
-    logging.debug('Saved %s' % md_file)
+    logging.debug('%s: Saved rendered data as markdown', ref_no)

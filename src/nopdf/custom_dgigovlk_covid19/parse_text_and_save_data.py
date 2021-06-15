@@ -1,6 +1,7 @@
 """Parse text."""
 
 import re
+import logging
 import datetime
 
 from utils import timex, jsonx
@@ -320,4 +321,5 @@ def parse_text_and_save_data(ref_no, text):
     ref_prefix = _get_ref_prefix(ref_no)
     data_file = '/tmp/%s.json' % (ref_prefix)
     jsonx.write(data_file, info)
+    logging.debug('%s: Saved parsed text as data', ref_no)
     return info

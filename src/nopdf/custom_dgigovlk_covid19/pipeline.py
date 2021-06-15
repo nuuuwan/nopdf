@@ -62,9 +62,18 @@ def group_images_by_ref_and_page(image_urls):
     return ref_to_page_to_url
 
 
-def custom_dgigovlk(
-    force_source_redownload=False,
-):
+def _download_text_from_github(ref_no):
+    ref_prefix = _get_ref_prefix(ref_no)
+    github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_prefix)
+    if www.exists(github_text_url):
+        all_text = www.read(github_text_url)
+        logging.debug('%s: Downloaded from GitHub.', ref_no)
+        return all_text
+    logging.debug('%s: Not on GitHub.', ref_no)
+    return None
+
+
+def custom_dgigovlk():
     """Run custom."""
     image_urls = _get_image_urls()
     ref_to_page_to_url = group_images_by_ref_and_page(image_urls)
@@ -75,50 +84,32 @@ def custom_dgigovlk(
         key=lambda item: item[0],
     ):
         ref_prefix = _get_ref_prefix(ref_no)
-        all_text_file = '/tmp/%s.txt' % (ref_prefix)
-        github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_prefix)
+        all_text = _download_text_from_github(ref_no)
+        if not all_text:
+            all_text = ''
+            for page_no, url in sorted(
+                page_to_url.items(),
+                key=lambda item: item[0],
+            ):
+                image_file = '/tmp/%s.jpeg' % (ref_prefix)
+                www.download_binary(url, image_file)
+                logging.debug('%s: Downloaded image - page %d', ref_no, page_no)
 
-        if not os.path.exists(all_text_file):
-            if not force_source_redownload \
-                    and www.exists(github_text_url):
-                all_text = www.read(github_text_url)
-                logging.debug('%s exists.', github_text_url)
-            else:
-                all_text = ''
-                for page_no, url in sorted(
-                    page_to_url.items(),
-                    key=lambda item: item[0],
-                ):
-                    ref_name = 'nopdf.dgigovlk.ref%s.page%s' % (
-                        ref_no,
-                        page_no,
-                    )
-                    image_file = '/tmp/%s.jpeg' % (ref_name)
-                    if not os.path.exists(image_file):
-                        www.download_binary(url, image_file)
+                text_file = '/tmp/%s.txt' % (ref_prefix)
+                text = ocr.ocr(image_file, text_file)
+                logging.debug('%s: OCRed text - page %d', ref_no, page_no)
 
-                    text_file = '/tmp/%s.txt' % (ref_name)
-                    if not os.path.exists(text_file):
-                        text = ocr.ocr(image_file, text_file)
-                    else:
-                        text = filex.read(text_file)
+                all_text += text
 
-                    all_text += text
-                filex.write(all_text_file, all_text)
-        else:
-            all_text = filex.read(all_text_file)
+            all_text_file = '/tmp/%s.txt' % (ref_prefix)
+            filex.write(all_text_file, all_text)
+            logging.debug('%s: Wrote all text', ref_no)
 
-        data_file = '/tmp/%s.json' % (ref_prefix)
         data = parse_text_and_save_data(ref_no, all_text)
-        jsonx.write(data_file, data)
         data_list.append(data)
         render_data_as_markdown(data)
-
-    logging.info('Found %d press releases.', len(data_list))
     return data_list
 
 
 if __name__ == '__main__':
-    custom_dgigovlk(
-        force_source_redownload=False,
-    )
+    custom_dgigovlk()

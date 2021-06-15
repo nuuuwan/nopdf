@@ -76,10 +76,14 @@ def _render_summary_and_save(data_list):
     lines.append('Source: [Department of Government Information](%s)' % URL)
 
     for data in reversed(data_list):
-        print(data)
-        lines.append('* %s (%s)' % (
+        ref_no = data['ref_no']
+        ref_prefix = _get_ref_prefix(ref_no)
+        md_file = './%s.md' % (ref_prefix)
+
+        lines.append('* [%s (%s)](%s)' % (
             data['datetime'],
-            data['ref_no'],
+            ref_no,
+            md_file,
         ))
     filex.write(summary_file_name, '\n'.join(lines))
     log.info('Saved summary')

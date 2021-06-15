@@ -94,8 +94,11 @@ def parse_text_and_save_data(ref_no, text):
                 'Below 30 years': [0, 30],
                 'Between 30-59 years': [30, 60],
                 '60 years and above': [60, 130],
-                'Total': None,
-            }[result_data['age']]
+                'Total': 'Total',
+            }.get(result_data['age'], None)
+
+            if age_range == 'Total':
+                continue
 
             if age_range:
                 if result_data['male'] == '-':
@@ -114,7 +117,7 @@ def parse_text_and_save_data(ref_no, text):
                     'gender': 'Female',
                     'deaths': (int)(result_data['female']),
                 })
-            continue
+                continue
 
         result = re.search(REGEX_DAY_DEATHS, line)
         if result:

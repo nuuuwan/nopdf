@@ -1,11 +1,7 @@
 """CustomDgigovlk."""
-import os
 import re
-import datetime
 
-from utils import filex, www, timex, jsonx
-from gig import ents
-
+from utils import filex, www
 from nopdf import scrape, ocr
 
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
@@ -52,6 +48,7 @@ def group_images_by_ref_and_page(image_urls):
         if ref_no not in ref_to_page_to_url:
             ref_to_page_to_url[ref_no] = {}
         ref_to_page_to_url[ref_no][page_no] = url
+
     log.info(
         'Found %d press-releases.',
         len(ref_to_page_to_url.keys()),
@@ -62,12 +59,30 @@ def group_images_by_ref_and_page(image_urls):
 def _download_text_from_github(ref_no):
     ref_prefix = _get_ref_prefix(ref_no)
     github_text_url = '%s/%s.txt' % (GITHUB_URL, ref_prefix)
+
     if www.exists(github_text_url):
         all_text = www.read(github_text_url)
         log.info('%s: Downloaded from GitHub.', ref_no)
         return all_text
+
     log.info('%s: Not on GitHub.', ref_no)
     return None
+
+
+def _render_summary_and_save(data_list):
+    summary_file_name = '/tmp/README.md'
+    lines = []
+    lines.append('# Summary of COVID19 Press Releases')
+    lines.append('Source: [Department of Government Information](%s)' % URL)
+
+    for data in reversed(data_list):
+        print(data)
+        lines.append('* %s (%s)' % (
+            data['datetime'],
+            data['ref_no'],
+        ))
+    filex.write(summary_file_name, '\n'.join(lines))
+    log.info('Saved summary')
 
 
 def custom_dgigovlk():
@@ -79,9 +94,14 @@ def custom_dgigovlk():
     for ref_no, page_to_url in sorted(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
-    ):
+    )[:-2]:
         ref_prefix = _get_ref_prefix(ref_no)
-        all_text = _download_text_from_github(ref_no)
+
+        all_text_file = '/tmp/%s.txt' % (ref_prefix)
+        all_text = filex.read(all_text_file)
+
+        # all_text = _download_text_from_github(ref_no)
+
         if not all_text:
             all_text = ''
             for page_no, url in sorted(
@@ -95,7 +115,6 @@ def custom_dgigovlk():
                 text_file = '/tmp/%s.txt' % (ref_prefix)
                 text = ocr.ocr(image_file, text_file)
                 log.info('%s: OCRed text - page %s', ref_no, page_no)
-
                 all_text += text
 
             all_text_file = '/tmp/%s.txt' % (ref_prefix)
@@ -105,7 +124,7 @@ def custom_dgigovlk():
         data = parse_text_and_save_data(ref_no, all_text)
         data_list.append(data)
         render_data_as_markdown(data)
-    return data_list
+    _render_summary_and_save(data_list)
 
 
 if __name__ == '__main__':

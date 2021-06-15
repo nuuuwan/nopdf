@@ -16,8 +16,6 @@ from nopdf.custom_dgigovlk_covid19.constants_re import \
     REGEX_NEW_CONF, REGEX_PLACE_DEATHS, REGEX_TIME
 
 
-
-
 def parse_text_and_save_data(ref_no, text):
     """Parse text."""
     lines = text.split('\n')

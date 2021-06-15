@@ -9,10 +9,11 @@ from gig import ents
 from nopdf.custom_dgigovlk_covid19.IGNORE_REGEX_LIST import IGNORE_REGEX_LIST
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
 
-from nopdf.custom_dgigovlk_covid19.constants_re import \
+from nopdf.custom_dgigovlk_covid19.REGEX import \
     REGEX_AGE_DEATHS, REGEX_CUM_CONF_NEW_YEAR, \
     REGEX_CUM_CONF_PATIENTS, REGEX_CUM_CONF, REGEX_CUM_DEATHS, \
     REGEX_DATE, REGEX_DAY_DEATHS, REGEX_GENDER_DEATHS, \
+    REGEX_GENDER_AGE_DEATHS, \
     REGEX_NEW_CONF, REGEX_PLACE_DEATHS, REGEX_TIME
 
 
@@ -23,6 +24,7 @@ def parse_text_and_save_data(ref_no, text):
     info = {'ref_no': ref_no}
 
     deaths_by_day = []
+    deaths_by_age_and_gender = []
     deaths_by_gender = []
     deaths_by_age = []
     deaths_py_place = []
@@ -45,7 +47,7 @@ def parse_text_and_save_data(ref_no, text):
     uncategorized_text_lines = []
 
     while i_line < n_lines:
-        line = lines[i_line].replace('¢', '').strip()
+        line = lines[i_line].replace('¢', '').replace(' ll', ' 11').strip()
         i_line += 1
         if len(line.strip()) == 0:
             continue
@@ -83,6 +85,35 @@ def parse_text_and_save_data(ref_no, text):
         result = re.search(REGEX_CUM_DEATHS, line)
         if result:
             cum_deaths = (int)(result.groupdict()['cum_deaths'])
+            continue
+
+        result = re.search(REGEX_GENDER_AGE_DEATHS, line)
+        if result:
+            result_data = result.groupdict()
+            age_range = {
+                'Below 30 years': [0, 30],
+                'Between 30-59 years': [30, 60],
+                '60 years and above': [60, 130],
+                'Total': None,
+            }[result_data['age']]
+
+            if age_range:
+                if result_data['male'] == '-':
+                    result_data['male'] = 0
+                if result_data['female'] == '-':
+                    result_data['female'] = 0
+
+                deaths_by_age_and_gender.append({
+                    'age_range': age_range,
+                    'gender': 'Male',
+                    'deaths': (int)(result_data['male']),
+                })
+
+                deaths_by_age_and_gender.append({
+                    'age_range': age_range,
+                    'gender': 'Female',
+                    'deaths': (int)(result_data['female']),
+                })
             continue
 
         result = re.search(REGEX_DAY_DEATHS, line)
@@ -241,6 +272,8 @@ def parse_text_and_save_data(ref_no, text):
 
     if deaths_by_day:
         info['deaths_by_day'] = deaths_by_day
+    if deaths_by_age_and_gender:
+        info['deaths_by_age_and_gender'] = deaths_by_age_and_gender
     if deaths_by_gender:
         info['deaths_by_gender'] = deaths_by_gender
     if deaths_by_age:

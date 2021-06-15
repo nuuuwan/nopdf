@@ -16,6 +16,9 @@ IGNORE_REGEX_LIST = [
     r'.*INFECTIONS REPORTED.*',
     r'.*reported patients.*',
     r'.*Slyww.*',
+    r'.*SAmwwwy.*',
+    r'.*SAmwwwy.*',
+    r'.*novellas.*',
     r'\d{4}\.\d{2}\.\d{2}',
     r'© 163.*',
     r'103, Ageia ney, Gar',
@@ -54,4 +57,5 @@ IGNORE_REGEX_LIST = [
     r'Update',
     r'Slyw\., ed\) WRN\)',
     r'SPywwwy > Inn',
+    r'Age group Female Male Total',
 ]

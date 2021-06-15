@@ -48,6 +48,16 @@ def render_data_as_markdown(data):
                 info['date'],
                 str(info['deaths']),
             )
+    if 'deaths_by_age_and_gender' in data:
+        rendered_stats += '### Deaths by Age and Gender\n'
+        for info in data['deaths_by_age_and_gender']:
+            rendered_stats += '* %s to %s + %s: %s\n' % (
+                str(info['age_range'][0]),
+                str(info['age_range'][1]),
+                info['gender'],
+                str(info['deaths']),
+            )
+
     if 'deaths_by_gender' in data:
         rendered_stats += '### Deaths by Gender\n'
         for info in data['deaths_by_gender']:

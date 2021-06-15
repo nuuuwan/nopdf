@@ -12,5 +12,7 @@ REGEX_GENDER_DEATHS = r'(?P<gender>\w+ale)\s*-\s*(?P<deaths>\d+).*'
 REGEX_NEW_CONF = r'\((?P<new_conf>\d+) within the day\)'
 REGEX_PLACE_DEATHS = r'(?P<place>.*(Residence|hospital).*)\s*-' \
     + r'\s*(?P<deaths>\d+).*'
+REGEX_GENDER_AGE_DEATHS = \
+    r'^(?P<age>.+) (?P<male>(-|\d{2})) (?P<female>(-|\d{2})) (?P<total>(-|\d{2}))'
 
 REGEX_TIME = r'Time\s*:\s*(?P<time>\d+.\d{2})\s*'

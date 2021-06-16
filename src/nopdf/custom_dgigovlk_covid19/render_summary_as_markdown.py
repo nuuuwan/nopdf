@@ -50,6 +50,8 @@ def render_summary_as_markdown(data_list):
     lines = []
     lines.append('# Summary of COVID19 Press Releases')
     lines.append('Source: [Department of Government Information](%s)' % URL)
+    lines.append('\n')
+    lines.append('\n')
 
     for data in reversed(data_list):
         ref_no = data['ref_no']

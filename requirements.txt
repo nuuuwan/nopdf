@@ -1,7 +1,8 @@
+bs4
+tweepy
 Pillow
 tesseract
 tesseract-ocr
 pytesseract
-bs4
 utils-nuuuwan
 gig-nuuuwan

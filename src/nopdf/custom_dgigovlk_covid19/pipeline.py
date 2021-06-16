@@ -5,16 +5,16 @@ import argparse
 from utils import filex, www
 from nopdf import scrape, ocr
 
+
+from nopdf.custom_dgigovlk_covid19.CONSTANTS import URL, GITHUB_URL
+from nopdf.custom_dgigovlk_covid19.REGEX import REGEX_MEDIA_URL
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
-from nopdf.custom_dgigovlk_covid19.render_data_as_markdown \
-    import render_data_as_markdown
 from nopdf.custom_dgigovlk_covid19.parse_text_and_save_data \
     import parse_text_and_save_data
-
-URL = 'https://www.dgi.gov.lk/news/press-releases-sri-lanka/covid-19-documents'
-GITHUB_URL = 'https://raw.githubusercontent.com/nuuuwan/nopdf_data/main'
-REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+' \
-    + r'(?P<ref_no>\d{3}).+-page-(?P<page_no>\d{3}).+'
+from nopdf.custom_dgigovlk_covid19.render_data_as_markdown \
+    import render_data_as_markdown
+from nopdf.custom_dgigovlk_covid19.render_summary_as_markdown \
+    import render_summary_as_markdown
 
 
 def _filter_press_releases(url_list):
@@ -70,26 +70,6 @@ def _download_text_from_github(ref_no):
     return None
 
 
-def _render_summary_and_save(data_list):
-    summary_file_name = '/tmp/README.md'
-    lines = []
-    lines.append('# Summary of COVID19 Press Releases')
-    lines.append('Source: [Department of Government Information](%s)' % URL)
-
-    for data in reversed(data_list):
-        ref_no = data['ref_no']
-        ref_prefix = _get_ref_prefix(ref_no)
-        md_file = './%s.md' % (ref_prefix)
-
-        lines.append('* [%s (%s)](%s)' % (
-            data['datetime'],
-            ref_no,
-            md_file,
-        ))
-    filex.write(summary_file_name, '\n'.join(lines))
-    log.info('Saved summary')
-
-
 def custom_dgigovlk():
     """Run custom."""
     image_urls = _get_image_urls()
@@ -125,7 +105,7 @@ def custom_dgigovlk():
         data = parse_text_and_save_data(ref_no, all_text)
         data_list.append(data)
         render_data_as_markdown(data, all_text, page_nos)
-    _render_summary_and_save(data_list)
+    render_summary_as_markdown(data_list)
 
 
 if __name__ == '__main__':

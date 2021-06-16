@@ -1,5 +1,8 @@
 """Constants."""
 
+REGEX_MEDIA_URL = r'.+/(?P<date>\d{4}\.\d{2}\.\d{2})/.+' \
+    + r'(?P<ref_no>\d{3}).+-page-(?P<page_no>\d{3}).+'
+
 REGEX_AGE_DEATHS = r'(?P<age>.+) [Y|y]ears\s*-\s*(?P<deaths>\d+).*'
 REGEX_CUM_CONF = r'Total - (?P<cum_conf>\d+)'
 REGEX_CUM_CONF_NEW_YEAR = r'.*New Year.* (?P<cum_conf_new_year>\d+)\s*'

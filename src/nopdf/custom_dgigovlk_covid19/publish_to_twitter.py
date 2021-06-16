@@ -5,10 +5,10 @@ import tweepy
 
 def publish_to_twitter(
     data,
-    api_key,
-    api_secret_key,
-    access_token,
-    access_token_secret,
+    twtr_api_key,
+    twtr_api_secret_key,
+    twtr_access_token,
+    twtr_access_token_secret,
 ):
     """Publish to Twitter."""
     auth = tweepy.OAuthHandler(api_key, api_secret_key)

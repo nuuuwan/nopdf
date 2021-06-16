@@ -1,5 +1,6 @@
 """CustomDgigovlk."""
 import re
+import argparse
 
 from utils import filex, www
 from nopdf import scrape, ocr
@@ -128,4 +129,21 @@ def custom_dgigovlk():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Run pipeline for custom_dgigovlk_covid19.',
+    )
+
+    for twtr_arg_name in [
+        'twtr_api_key',
+        'twtr_api_secret_key',
+        'twtr_access_token',
+        'twtr_access_token_secret',
+    ]:
+        parser.add_argument(
+            '--' + twtr_arg_name,
+            type=str,
+            required=False,
+            default=None,
+        )
+    args = parser.parse_args()
     custom_dgigovlk()

@@ -100,9 +100,8 @@ def custom_dgigovlk():
         key=lambda item: item[0],
     ):
         ref_prefix = _get_ref_prefix(ref_no)
-
         all_text = _download_text_from_github(ref_no)
-
+        page_nos = list(page_to_url.keys())
         if not all_text:
             all_text = ''
             for page_no, url in sorted(
@@ -124,7 +123,7 @@ def custom_dgigovlk():
 
         data = parse_text_and_save_data(ref_no, all_text)
         data_list.append(data)
-        render_data_as_markdown(data)
+        render_data_as_markdown(data, all_text, page_nos)
     _render_summary_and_save(data_list)
 
 

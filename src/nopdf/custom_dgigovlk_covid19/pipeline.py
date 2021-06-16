@@ -14,6 +14,8 @@ from nopdf.custom_dgigovlk_covid19.render_data_as_markdown \
     import render_data_as_markdown
 from nopdf.custom_dgigovlk_covid19.render_summary_as_markdown \
     import render_summary_as_markdown
+from nopdf.custom_dgigovlk_covid19.publish_to_twitter \
+    import publish_to_twitter
 
 
 def _filter_press_releases(url_list):
@@ -69,7 +71,12 @@ def _download_text_from_github(ref_no):
     return None
 
 
-def custom_dgigovlk():
+def custom_dgigovlk(
+    twtr_api_key,
+    twtr_api_secret_key,
+    twtr_access_token,
+    twtr_access_token_secret,
+):
     """Run custom."""
     image_urls = _get_image_urls()
     ref_to_page_to_url = group_images_by_ref_and_page(image_urls)
@@ -79,8 +86,6 @@ def custom_dgigovlk():
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
     ):
-        # if ref_no not in ['561', '564']:
-        #     continue
         ref_prefix = _get_ref_prefix(ref_no)
         all_text = _download_text_from_github(ref_no)
         page_nos = list(page_to_url.keys())
@@ -102,10 +107,19 @@ def custom_dgigovlk():
             all_text_file = '/tmp/%s.txt' % (ref_prefix)
             filex.write(all_text_file, all_text)
             log.info('%s: Wrote all text', ref_no)
+
         data = parse_text_and_save_data(ref_no, all_text)
+        data['page_nos'] = page_nos
+
         data_list.append(data)
         render_data_as_markdown(data, all_text, page_nos)
-        # break # Testing only!
+        publish_to_twitter(
+            data,
+            twtr_api_key,
+            twtr_api_secret_key,
+            twtr_access_token,
+            twtr_access_token_secret,
+        )
 
     render_summary_as_markdown(data_list)
 
@@ -128,4 +142,9 @@ if __name__ == '__main__':
             default=None,
         )
     args = parser.parse_args()
-    custom_dgigovlk()
+    custom_dgigovlk(
+        args.twtr_api_key,
+        args.twtr_api_secret_key,
+        args.twtr_access_token,
+        args.twtr_access_token_secret,
+    )

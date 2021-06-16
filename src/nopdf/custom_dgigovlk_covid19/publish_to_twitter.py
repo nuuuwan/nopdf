@@ -2,6 +2,7 @@
 import json
 import tweepy
 
+
 def publish_to_twitter(
     data,
     api_key,

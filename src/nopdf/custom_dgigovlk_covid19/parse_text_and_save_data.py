@@ -35,6 +35,7 @@ def parse_text_and_save_data(ref_no, text):
     cum_conf_patients = None
     new_conf = None
     cum_deaths = None
+    new_deaths = None
     n_lines = len(lines)
     i_line = 0
     area_of_residence_lines = []
@@ -275,8 +276,22 @@ def parse_text_and_save_data(ref_no, text):
 
     if deaths_by_day:
         info['deaths_by_day'] = deaths_by_day
+        if not new_deaths:
+            new_deaths = sum(list(map(
+                lambda datum: datum['deaths'],
+                deaths_by_day,
+            )))
     if deaths_by_age_and_gender:
         info['deaths_by_age_and_gender'] = deaths_by_age_and_gender
+        if not new_deaths:
+            new_deaths = sum(list(map(
+                lambda datum: datum['deaths'],
+                deaths_by_age_and_gender,
+            )))
+
+    if new_deaths:
+        info['new_deaths'] = new_deaths
+
     if deaths_by_gender:
         info['deaths_by_gender'] = deaths_by_gender
     if deaths_by_age:

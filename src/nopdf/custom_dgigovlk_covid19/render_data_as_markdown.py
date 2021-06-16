@@ -38,6 +38,13 @@ def render_data_as_markdown(data, all_text, page_nos):
             'New Cases',
             str(data['new_conf']),
         )
+
+    if 'new_deaths' in data:
+        rendered_stats += '* %s: %s\n' % (
+            'New Deaths',
+            str(data['new_deaths']),
+        )
+
     if 'cum_deaths' in data:
         rendered_stats += '* %s: %s\n' % (
             'Total Deaths',

@@ -5,7 +5,6 @@ import argparse
 from utils import filex, www
 from nopdf import scrape, ocr
 
-
 from nopdf.custom_dgigovlk_covid19.CONSTANTS import URL, GITHUB_URL
 from nopdf.custom_dgigovlk_covid19.REGEX import REGEX_MEDIA_URL
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
@@ -101,10 +100,11 @@ def custom_dgigovlk():
             all_text_file = '/tmp/%s.txt' % (ref_prefix)
             filex.write(all_text_file, all_text)
             log.info('%s: Wrote all text', ref_no)
-
         data = parse_text_and_save_data(ref_no, all_text)
         data_list.append(data)
         render_data_as_markdown(data, all_text, page_nos)
+        # break # Testing only!
+
     render_summary_as_markdown(data_list)
 
 

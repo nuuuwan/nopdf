@@ -139,7 +139,7 @@ def render_data_as_markdown(data, all_text, page_nos):
         lambda page_no: '''
 ### Page %s
 
-![page_no](./%s.page%s.jpeg)
+![page_no](https://raw.githubusercontent.com/nuuuwan/nopdf_data/main/%s.page%s.jpeg)
         ''' % (page_no, ref_prefix, page_no),
         page_nos,
     )))

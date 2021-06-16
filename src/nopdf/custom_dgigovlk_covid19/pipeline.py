@@ -108,7 +108,7 @@ def custom_dgigovlk():
                 page_to_url.items(),
                 key=lambda item: item[0],
             ):
-                image_file = '/tmp/%s.jpeg' % (ref_prefix)
+                image_file = '/tmp/%s.page%s.jpeg' % (ref_prefix, page_no)
                 www.download_binary(url, image_file)
                 log.info('%s: Downloaded image - page %s', ref_no, page_no)
 

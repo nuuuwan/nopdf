@@ -34,7 +34,8 @@ jobs:
     - name: Run
       run: |
         export PYTHONPATH="$PYTHONPATH:./src"
-        python src/nopdf/custom_dgigovlk_covid19/pipeline.py
+        python src/nopdf/custom_dgigovlk_covid19/pipeline.py --twtr_api_key "${{ secrets.TWTR_API_KEY}}" --twtr_api_secret_key "${{ secrets.TWTR_API_SECRET_KEY}}" --twtr_access_token "${{ secrets.TWTR_ACCESS_TOKEN}}" --twtr_access_token_secret "${{ secrets.TWTR_ACCESS_TOKEN_SECRET}}"
+
 
     - name: Checkout nopdf_data
       uses: actions/checkout@v2

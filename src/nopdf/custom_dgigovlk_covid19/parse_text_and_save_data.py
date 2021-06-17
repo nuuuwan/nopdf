@@ -102,10 +102,12 @@ def parse_text_and_save_data(ref_no, text):
                 continue
 
             if age_range:
-                if result_data['male'] == '-':
-                    result_data['male'] = 0
-                if result_data['female'] == '-':
-                    result_data['female'] = 0
+
+                def clean_death_int(x):
+                    return x.replace('-', '0').replace('A,', '1')
+
+                result_data['male'] = clean_death_int(result_data['male'])
+                result_data['female'] = clean_death_int(result_data['female'])
 
                 deaths_by_age_and_gender.append({
                     'age_range': age_range,

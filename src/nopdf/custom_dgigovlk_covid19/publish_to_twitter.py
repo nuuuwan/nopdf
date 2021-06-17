@@ -57,7 +57,7 @@ def publish_to_twitter(
 
     images = _get_images(data)
     if not images:
-        log.info('%s: No images. Not tweeting')
+        log.info('%s: No images. Not tweeting', ref_no)
         return
 
     media_ids = []

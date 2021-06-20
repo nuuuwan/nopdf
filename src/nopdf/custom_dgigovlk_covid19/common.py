@@ -2,7 +2,6 @@
 import logging
 
 PROJECT_PREFIX = 'nopdf.dgigovlk'
-
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('nopdf')
 

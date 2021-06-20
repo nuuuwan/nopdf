@@ -5,6 +5,8 @@ import time
 
 import tweepy
 
+from utils import timex
+
 from nopdf.custom_dgigovlk_covid19.CONSTANTS import GITHUB_TOOL_URL
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
 from nopdf.custom_dgigovlk_covid19.render_summary_as_markdown \
@@ -67,6 +69,15 @@ def publish_to_twitter(
         media_ids.append(media_id)
         log.info('%s: Uploaded image to twitter as %s', ref_no, media_id)
 
-    log.info('%s: Tweeting: %s', ref_no, tweet_text)
     api.update_status(tweet_text, media_ids=media_ids)
+
+    date = timex.format_time(timex.get_unixtime(), '%B %d, %Y %H:%M%p')
+    timezone = timex.get_timezone()
+    api.update_profile(
+        description='''Statistics about Sri Lanka.
+
+Automatically updated at {date} {timezone}
+        '''.format(date=date, timezone=timezone)
+    )
+    log.info('%s: Tweeted: %s', ref_no, tweet_text)
     time.sleep(random.random() * 5)

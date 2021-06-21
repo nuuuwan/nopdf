@@ -104,7 +104,9 @@ def parse_text_and_save_data(ref_no, text):
             if age_range:
 
                 def clean_death_int(x):
-                    return x.replace('-', '0').replace('A,', '1')
+                    return x.replace('-', '0')\
+                        .replace('A,', '1')\
+                        .replace('Ol', '01')
 
                 result_data['male'] = clean_death_int(result_data['male'])
                 result_data['female'] = clean_death_int(result_data['female'])

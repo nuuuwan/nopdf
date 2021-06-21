@@ -62,6 +62,8 @@ def publish_to_twitter(
         log.info('%s: No images. Not tweeting', ref_no)
         return
 
+    if len(images) > 4:
+        images = images[:4]
     media_ids = []
     for image in images:
         res = api.media_upload(image)

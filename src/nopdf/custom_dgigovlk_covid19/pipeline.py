@@ -32,7 +32,7 @@ def _get_image_urls():
     media_url_list = scrape.scrape(URL)
     image_urls = _filter_press_releases(media_url_list)
     log.info(
-        'Found %d press-release images',
+        'Found %d press-release images: %s',
         len(image_urls),
         ';'.join(image_urls),
     )

@@ -21,7 +21,7 @@ from nopdf.custom_dgigovlk_covid19.publish_to_twitter \
 def _filter_press_releases(url_list):
     def _is_press_release(url):
         return any([
-            'Press_Release' in url,
+            'Release' in url,
             'PR_' in url,
         ])
     return list(filter(_is_press_release, url_list))
@@ -31,7 +31,11 @@ def _get_image_urls():
     log.info('Scraping %s for urls', URL)
     media_url_list = scrape.scrape(URL)
     image_urls = _filter_press_releases(media_url_list)
-    log.info('Found %d press-release images', len(image_urls))
+    log.info(
+        'Found %d press-release images',
+        len(image_urls),
+        ';'.join(image_urls),
+    )
     return image_urls
 
 
@@ -113,13 +117,13 @@ def custom_dgigovlk(
 
         data_list.append(data)
         render_data_as_markdown(data, all_text, page_nos)
-        publish_to_twitter(
-            data,
-            twtr_api_key,
-            twtr_api_secret_key,
-            twtr_access_token,
-            twtr_access_token_secret,
-        )
+        # publish_to_twitter(
+        #     data,
+        #     twtr_api_key,
+        #     twtr_api_secret_key,
+        #     twtr_access_token,
+        #     twtr_access_token_secret,
+        # )
 
     render_summary_as_markdown(data_list)
 

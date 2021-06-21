@@ -221,7 +221,7 @@ def parse_text_and_save_data(ref_no, text):
             'Complex' in line,
             'Estate' in line,
             'watta' in line,
-        ]):
+        ]) and len(line) < 30:
             gnd_name = line.replace('e ', '').replace('\u00a2', '')\
                 .replace('© ', '').strip()
             gnd_name = gnd_name.replace('=', '').strip()

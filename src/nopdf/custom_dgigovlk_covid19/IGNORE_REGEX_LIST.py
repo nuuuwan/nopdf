@@ -13,6 +13,7 @@ IGNORE_REGEX_LIST = [
     r'.*Gender.*',
     r'.*GnroeH.*',
     r'.*Henew.*',
+    r'.*Honewtadaserd.*',
     r'.*INFECTIONS REPORTED.*',
     r'.*reported patients.*',
     r'.*Sly.*',

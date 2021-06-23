@@ -89,8 +89,6 @@ def custom_dgigovlk(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
     ):
-        if ref_no != '597':
-            continue
         ref_prefix = _get_ref_prefix(ref_no)
         all_text = _download_text_from_github(ref_no)
         page_nos = list(page_to_url.keys())

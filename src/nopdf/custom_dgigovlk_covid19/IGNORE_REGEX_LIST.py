@@ -14,6 +14,8 @@ IGNORE_REGEX_LIST = [
     r'.*Gender.*',
     r'.*GnroeH.*',
     r'.*Henew.*',
+    r'.*Henes.*',
+    r'.*HOasS.*',
     r'.*Honewtadaserd.*',
     r'.*semmbmeScs.*',
     r'.*Henesrasenid.*',

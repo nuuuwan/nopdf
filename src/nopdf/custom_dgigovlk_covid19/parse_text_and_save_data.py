@@ -12,7 +12,7 @@ from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
 from nopdf.custom_dgigovlk_covid19.REGEX import \
     REGEX_AGE_DEATHS, REGEX_CUM_CONF_NEW_YEAR, \
     REGEX_CUM_CONF_PATIENTS, REGEX_CUM_CONF, REGEX_CUM_DEATHS, \
-    REGEX_DATE, REGEX_DAY_DEATHS, REGEX_GENDER_DEATHS, \
+    REGEX_DATE, REGEX_DATE2, REGEX_DAY_DEATHS, REGEX_GENDER_DEATHS, \
     REGEX_GENDER_AGE_DEATHS, \
     REGEX_NEW_CONF, REGEX_PLACE_DEATHS, REGEX_TIME
 
@@ -29,6 +29,7 @@ def parse_text_and_save_data(ref_no, text):
     deaths_by_age = []
     deaths_py_place = []
     date_str = None
+    date_str2 = None
     time_str = None
     cum_conf = None
     cum_conf_new_year = None
@@ -63,6 +64,11 @@ def parse_text_and_save_data(ref_no, text):
             date_str = result.groupdict()['date']
             continue
 
+        result = re.search(REGEX_DATE2, line)
+        if result:
+            date_str2 = result.groupdict()['date']
+            continue
+
         result = re.search(REGEX_CUM_CONF, line)
         if result:
             cum_conf = (int)(result.groupdict()['cum_conf'])
@@ -95,6 +101,7 @@ def parse_text_and_save_data(ref_no, text):
                 'Below 30 years': [0, 30],
                 'Between 30-59 years': [30, 60],
                 '60 years and above': [60, 130],
+                '60_years and above': [60, 130],
                 'Total': 'Total',
             }.get(result_data['age'], None)
 
@@ -261,6 +268,16 @@ def parse_text_and_save_data(ref_no, text):
         unixtime = timex.parse_time(
             date_str + ' ' + time_str.replace(':', '.'),
             '%d.%m.%Y' + ' ' + '%H.%M',
+        )
+        info['unixtime'] = unixtime
+        info['datetime'] = datetime.datetime\
+            .fromtimestamp(unixtime)\
+            .strftime('%Y-%m-%d %H:%M')
+
+    if date_str2:
+        unixtime = timex.parse_time(
+            date_str2 + ' ' + time_str.replace(':', '.'),
+            '%Y.%m.%d' + ' ' + '%H.%M',
         )
         info['unixtime'] = unixtime
         info['datetime'] = datetime.datetime\

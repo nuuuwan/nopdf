@@ -32,9 +32,8 @@ def _get_image_urls():
     media_url_list = scrape.scrape(URL)
     image_urls = _filter_press_releases(media_url_list)
     log.info(
-        'Found %d press-release images: %s',
+        'Found %d press-release images.',
         len(image_urls),
-        ';'.join(image_urls),
     )
     return image_urls
 
@@ -90,6 +89,8 @@ def custom_dgigovlk(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
     ):
+        if ref_no != '597':
+            continue
         ref_prefix = _get_ref_prefix(ref_no)
         all_text = _download_text_from_github(ref_no)
         page_nos = list(page_to_url.keys())

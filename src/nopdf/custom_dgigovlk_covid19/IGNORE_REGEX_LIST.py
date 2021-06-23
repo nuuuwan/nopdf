@@ -1,6 +1,7 @@
 """Constant."""
 
 IGNORE_REGEX_LIST = [
+    r'.*SAwwwy.*',
     r'.*\+94.*',
     r'.*163, Borgen.*',
     r'.*Age Group.*',
@@ -14,6 +15,8 @@ IGNORE_REGEX_LIST = [
     r'.*GnroeH.*',
     r'.*Henew.*',
     r'.*Honewtadaserd.*',
+    r'.*semmbmeScs.*',
+    r'.*Henesrasenid.*',
     r'.*INFECTIONS REPORTED.*',
     r'.*reported patients.*',
     r'.*Sly.*',

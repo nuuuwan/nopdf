@@ -35,10 +35,6 @@ def publish_to_twitter(
     """Publish to Twitter."""
     ref_no = data['ref_no']
 
-    auth = tweepy.OAuthHandler(twtr_api_key, twtr_api_secret_key)
-    auth.set_access_token(twtr_access_token, twtr_access_token_secret)
-    api = tweepy.API(auth)
-
     details_lines = _get_details_lines(data)
     details_text = '\n'.join(details_lines)
     ref_prefix = _get_ref_prefix(ref_no)
@@ -64,6 +60,14 @@ def publish_to_twitter(
 
     if len(images) > 4:
         images = images[:4]
+
+    if not twtr_api_key:
+        return
+
+    auth = tweepy.OAuthHandler(twtr_api_key, twtr_api_secret_key)
+    auth.set_access_token(twtr_access_token, twtr_access_token_secret)
+    api = tweepy.API(auth)
+
     media_ids = []
     for image in images:
         res = api.media_upload(image)

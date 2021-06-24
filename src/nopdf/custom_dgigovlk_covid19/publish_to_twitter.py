@@ -1,11 +1,7 @@
 """Publish to Twitter."""
 import os
-import random
-import time
 
-import tweepy
-
-from utils import timex
+from utils import twitter
 
 from nopdf.custom_dgigovlk_covid19.CONSTANTS import GITHUB_TOOL_URL
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
@@ -27,10 +23,6 @@ def _get_images(data):
 
 def publish_to_twitter(
     data,
-    twtr_api_key,
-    twtr_api_secret_key,
-    twtr_access_token,
-    twtr_access_token_secret,
 ):
     """Publish to Twitter."""
     ref_no = data['ref_no']
@@ -53,37 +45,14 @@ def publish_to_twitter(
         details_link=details_link,
     )
 
-    images = _get_images(data)
-    if not images:
+    status_image_files = _get_images(data)
+    if not status_image_files:
         log.info('%s: No images. Not tweeting', ref_no)
         return
 
-    if len(images) > 4:
-        images = images[:4]
-
-    if not twtr_api_key:
-        return
-
-    auth = tweepy.OAuthHandler(twtr_api_key, twtr_api_secret_key)
-    auth.set_access_token(twtr_access_token, twtr_access_token_secret)
-    api = tweepy.API(auth)
-
-    media_ids = []
-    for image in images:
-        res = api.media_upload(image)
-        media_id = res.media_id
-        media_ids.append(media_id)
-        log.info('%s: Uploaded image to twitter as %s', ref_no, media_id)
-
-    api.update_status(tweet_text, media_ids=media_ids)
-
-    date = timex.format_time(timex.get_unixtime(), '%B %d, %Y %H:%M%p')
-    timezone = timex.get_timezone()
-    api.update_profile(
-        description='''Statistics about Sri Lanka.
-
-Automatically updated at {date} {timezone}
-        '''.format(date=date, timezone=timezone)
+    twtr = twitter.Twitter.from_args()
+    twtr.tweet(
+        tweet_text=tweet_text,
+        status_image_files=status_image_files,
+        update_user_profile=True,
     )
-    log.info('%s: Tweeted: %s', ref_no, tweet_text)
-    time.sleep(random.random() * 5)

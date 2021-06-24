@@ -39,6 +39,7 @@ def _get_image_urls():
 
 
 def group_images_by_ref_and_page(image_urls):
+    """Group images."""
     ref_to_page_to_url = {}
     for url in image_urls:
         result = re.search(REGEX_MEDIA_URL, url)
@@ -74,12 +75,7 @@ def _download_text_from_github(ref_no):
     return None
 
 
-def custom_dgigovlk(
-    twtr_api_key,
-    twtr_api_secret_key,
-    twtr_access_token,
-    twtr_access_token_secret,
-):
+def custom_dgigovlk():
     """Run custom."""
     image_urls = _get_image_urls()
     ref_to_page_to_url = group_images_by_ref_and_page(image_urls)
@@ -89,6 +85,7 @@ def custom_dgigovlk(
         ref_to_page_to_url.items(),
         key=lambda item: item[0],
     ):
+
         ref_prefix = _get_ref_prefix(ref_no)
         all_text = _download_text_from_github(ref_no)
         page_nos = list(page_to_url.keys())
@@ -116,13 +113,7 @@ def custom_dgigovlk(
 
         data_list.append(data)
         render_data_as_markdown(data, all_text, page_nos)
-        publish_to_twitter(
-            data,
-            twtr_api_key,
-            twtr_api_secret_key,
-            twtr_access_token,
-            twtr_access_token_secret,
-        )
+        publish_to_twitter(data)
 
     render_summary_as_markdown(data_list)
 
@@ -145,9 +136,4 @@ if __name__ == '__main__':
             default=None,
         )
     args = parser.parse_args()
-    custom_dgigovlk(
-        args.twtr_api_key,
-        args.twtr_api_secret_key,
-        args.twtr_access_token,
-        args.twtr_access_token_secret,
-    )
+    custom_dgigovlk()

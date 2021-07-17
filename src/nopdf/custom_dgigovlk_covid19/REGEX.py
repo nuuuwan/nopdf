@@ -9,7 +9,7 @@ REGEX_CUM_CONF_NEW_YEAR = r'.*New Year.* (?P<cum_conf_new_year>\d+)\s*'
 REGEX_CUM_CONF_PATIENTS = r'.*atients reported.* (?P<cum_conf_patients>\d+)\s*'
 REGEX_CUM_DEATHS = r'.*otal.*deaths.* (?P<cum_deaths>\d+)\s*'
 
-REGEX_DATE = r'^(?P<date>\d{2}\.\d{2}\.\d{4})'
+REGEX_DATE = r'^(?P<date>\d{2}\s*\.\d{2}\.\d{4})'
 REGEX_DATE2 = r'^(?P<date>\d{4}\.\d{2}\.\d{2})'
 
 REGEX_DAY_DEATHS = r'(?P<day>[a-zA-Z]+ \d{2})\s*-\s*(?P<deaths>\d+).*'

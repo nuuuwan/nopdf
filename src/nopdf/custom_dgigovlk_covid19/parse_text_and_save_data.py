@@ -61,7 +61,7 @@ def parse_text_and_save_data(ref_no, text):
 
         result = re.search(REGEX_DATE, line)
         if result:
-            date_str = result.groupdict()['date']
+            date_str = result.groupdict()['date'].replace(' ', '')
             continue
 
         result = re.search(REGEX_DATE2, line)

@@ -1,6 +1,10 @@
 """Constant."""
 
 IGNORE_REGEX_LIST = [
+    r'.*HOISS.*',
+    r'.*HHS.*',
+    r'.*semmbomeSaqQo.*',
+    r'.*Honomasenid.*',
     r'.*SAwwwy.*',
     r'.*\+94.*',
     r'.*163, Borgen.*',

@@ -1,8 +1,9 @@
 name: Run custom_dgigovlk - Cron
 
-on:
-  schedule:
-    - cron:  "0 */1 * * *"
+# on:
+#   schedule:
+#     - cron:  "0 */1 * * *"
+on: workflow_dispatch    
 
 jobs:
   run_cmd:

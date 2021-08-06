@@ -1,29 +1,31 @@
 """CustomDgigovlk."""
-import re
 import argparse
+import re
 
 from utils import filex, www
-from nopdf import scrape, ocr
 
-from nopdf.custom_dgigovlk_covid19.CONSTANTS import URL, GITHUB_URL
-from nopdf.custom_dgigovlk_covid19.REGEX import REGEX_MEDIA_URL
+from nopdf import ocr, scrape
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
-from nopdf.custom_dgigovlk_covid19.parse_text_and_save_data \
-    import parse_text_and_save_data
-from nopdf.custom_dgigovlk_covid19.render_data_as_markdown \
-    import render_data_as_markdown
-from nopdf.custom_dgigovlk_covid19.render_summary_as_markdown \
-    import render_summary_as_markdown
-from nopdf.custom_dgigovlk_covid19.publish_to_twitter \
-    import publish_to_twitter
+from nopdf.custom_dgigovlk_covid19.CONSTANTS import GITHUB_URL, URL
+from nopdf.custom_dgigovlk_covid19.parse_text_and_save_data import \
+    parse_text_and_save_data
+from nopdf.custom_dgigovlk_covid19.publish_to_twitter import publish_to_twitter
+from nopdf.custom_dgigovlk_covid19.REGEX import REGEX_MEDIA_URL
+from nopdf.custom_dgigovlk_covid19.render_data_as_markdown import \
+    render_data_as_markdown
+from nopdf.custom_dgigovlk_covid19.render_summary_as_markdown import \
+    render_summary_as_markdown
 
 
 def _filter_press_releases(url_list):
     def _is_press_release(url):
-        return any([
-            'Release' in url,
-            'PR_' in url,
-        ])
+        return any(
+            [
+                'Release' in url,
+                'PR_' in url,
+            ]
+        )
+
     return list(filter(_is_press_release, url_list))
 
 

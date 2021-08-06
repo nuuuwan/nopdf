@@ -1,8 +1,9 @@
-bs4
-tweepy
+# Auto Generated
 Pillow
+bs4
+gig-nuuuwan
+pytesseract
 tesseract
 tesseract-ocr
-pytesseract
+tweepy
 utils-nuuuwan
-gig-nuuuwan

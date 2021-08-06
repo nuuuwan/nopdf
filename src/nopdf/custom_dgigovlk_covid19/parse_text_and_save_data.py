@@ -1,20 +1,24 @@
 """Parse text."""
 
-import re
 import datetime
+import re
 
-from utils import timex, jsonx
 from gig import ents
+from utils import jsonx, timex
 
-from nopdf.custom_dgigovlk_covid19.IGNORE_REGEX_LIST import IGNORE_REGEX_LIST
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
-
-from nopdf.custom_dgigovlk_covid19.REGEX import \
-    REGEX_AGE_DEATHS, REGEX_CUM_CONF_NEW_YEAR, \
-    REGEX_CUM_CONF_PATIENTS, REGEX_CUM_CONF, REGEX_CUM_DEATHS, \
-    REGEX_DATE, REGEX_DATE2, REGEX_DAY_DEATHS, REGEX_GENDER_DEATHS, \
-    REGEX_GENDER_AGE_DEATHS, \
-    REGEX_NEW_CONF, REGEX_PLACE_DEATHS, REGEX_TIME
+from nopdf.custom_dgigovlk_covid19.IGNORE_REGEX_LIST import IGNORE_REGEX_LIST
+from nopdf.custom_dgigovlk_covid19.REGEX import (REGEX_AGE_DEATHS,
+                                                 REGEX_CUM_CONF,
+                                                 REGEX_CUM_CONF_NEW_YEAR,
+                                                 REGEX_CUM_CONF_PATIENTS,
+                                                 REGEX_CUM_DEATHS, REGEX_DATE,
+                                                 REGEX_DATE2, REGEX_DAY_DEATHS,
+                                                 REGEX_GENDER_AGE_DEATHS,
+                                                 REGEX_GENDER_DEATHS,
+                                                 REGEX_NEW_CONF,
+                                                 REGEX_PLACE_DEATHS,
+                                                 REGEX_TIME)
 
 
 def parse_text_and_save_data(ref_no, text):
@@ -111,24 +115,30 @@ def parse_text_and_save_data(ref_no, text):
             if age_range:
 
                 def clean_death_int(x):
-                    return x.replace('-', '0')\
-                        .replace('A,', '1')\
+                    return (
+                        x.replace('-', '0')
+                        .replace('A,', '1')
                         .replace('Ol', '01')
+                    )
 
                 result_data['male'] = clean_death_int(result_data['male'])
                 result_data['female'] = clean_death_int(result_data['female'])
 
-                deaths_by_age_and_gender.append({
-                    'age_range': age_range,
-                    'gender': 'Male',
-                    'deaths': (int)(result_data['male']),
-                })
+                deaths_by_age_and_gender.append(
+                    {
+                        'age_range': age_range,
+                        'gender': 'Male',
+                        'deaths': (int)(result_data['male']),
+                    }
+                )
 
-                deaths_by_age_and_gender.append({
-                    'age_range': age_range,
-                    'gender': 'Female',
-                    'deaths': (int)(result_data['female']),
-                })
+                deaths_by_age_and_gender.append(
+                    {
+                        'age_range': age_range,
+                        'gender': 'Female',
+                        'deaths': (int)(result_data['female']),
+                    }
+                )
                 continue
 
         result = re.search(REGEX_DAY_DEATHS, line)
@@ -139,14 +149,16 @@ def parse_text_and_save_data(ref_no, text):
                     '2021 ' + result_data['day'],
                     '%Y %B %d',
                 )
-                date = datetime.datetime\
-                    .fromtimestamp(unixtime)\
-                    .strftime('%Y-%m-%d')
-                deaths_by_day.append({
-                    'unixtime': unixtime,
-                    'date': date,
-                    'deaths': (int)(result_data['deaths']),
-                })
+                date = datetime.datetime.fromtimestamp(unixtime).strftime(
+                    '%Y-%m-%d'
+                )
+                deaths_by_day.append(
+                    {
+                        'unixtime': unixtime,
+                        'date': date,
+                        'deaths': (int)(result_data['deaths']),
+                    }
+                )
                 continue
             except ValueError:
                 pass
@@ -154,19 +166,23 @@ def parse_text_and_save_data(ref_no, text):
         result = re.search(REGEX_GENDER_DEATHS, line)
         if result:
             result_data = result.groupdict()
-            deaths_by_gender.append({
-                'gender': result_data['gender'],
-                'deaths': (int)(result_data['deaths'])
-            })
+            deaths_by_gender.append(
+                {
+                    'gender': result_data['gender'],
+                    'deaths': (int)(result_data['deaths']),
+                }
+            )
             continue
 
         result = re.search(REGEX_PLACE_DEATHS, line)
         if result:
             result_data = result.groupdict()
-            deaths_py_place.append({
-                'place': result_data['place'],
-                'deaths': (int)(result_data['deaths'])
-            })
+            deaths_py_place.append(
+                {
+                    'place': result_data['place'],
+                    'deaths': (int)(result_data['deaths']),
+                }
+            )
             continue
 
         result = re.search(REGEX_AGE_DEATHS, line)
@@ -179,10 +195,12 @@ def parse_text_and_save_data(ref_no, text):
                 age_range = [0, 20]
             else:
                 age_range = [99, 130]
-            deaths_by_age.append({
-                'age_range': age_range,
-                'deaths': (int)(result_data['deaths'])
-            })
+            deaths_by_age.append(
+                {
+                    'age_range': age_range,
+                    'deaths': (int)(result_data['deaths']),
+                }
+            )
             continue
 
         if 'Area of Residence' in line:
@@ -217,20 +235,29 @@ def parse_text_and_save_data(ref_no, text):
                 region_data[district_name][police_area_name] = []
             continue
 
-        if any([
-            'Scheme' in line,
-            'Place' in line,
-            'Division' in line,
-            'Diivision' in line,
-            'Road' in line,
-            'Mawatha' in line,
-            'Grama' in line,
-            'Complex' in line,
-            'Estate' in line,
-            'watta' in line,
-        ]) and len(line) < 30:
-            gnd_name = line.replace('e ', '').replace('\u00a2', '')\
-                .replace('© ', '').strip()
+        if (
+            any(
+                [
+                    'Scheme' in line,
+                    'Place' in line,
+                    'Division' in line,
+                    'Diivision' in line,
+                    'Road' in line,
+                    'Mawatha' in line,
+                    'Grama' in line,
+                    'Complex' in line,
+                    'Estate' in line,
+                    'watta' in line,
+                ]
+            )
+            and len(line) < 30
+        ):
+            gnd_name = (
+                line.replace('e ', '')
+                .replace('\u00a2', '')
+                .replace('© ', '')
+                .strip()
+            )
             gnd_name = gnd_name.replace('=', '').strip()
             if gnd_name in [
                 'iladhari Diivision',
@@ -270,9 +297,9 @@ def parse_text_and_save_data(ref_no, text):
             '%d.%m.%Y' + ' ' + '%H.%M',
         )
         info['unixtime'] = unixtime
-        info['datetime'] = datetime.datetime\
-            .fromtimestamp(unixtime)\
-            .strftime('%Y-%m-%d %H:%M')
+        info['datetime'] = datetime.datetime.fromtimestamp(unixtime).strftime(
+            '%Y-%m-%d %H:%M'
+        )
 
     if date_str2:
         unixtime = timex.parse_time(
@@ -280,9 +307,9 @@ def parse_text_and_save_data(ref_no, text):
             '%Y.%m.%d' + ' ' + '%H.%M',
         )
         info['unixtime'] = unixtime
-        info['datetime'] = datetime.datetime\
-            .fromtimestamp(unixtime)\
-            .strftime('%Y-%m-%d %H:%M')
+        info['datetime'] = datetime.datetime.fromtimestamp(unixtime).strftime(
+            '%Y-%m-%d %H:%M'
+        )
 
     if cum_conf:
         info['cum_conf'] = cum_conf
@@ -298,17 +325,25 @@ def parse_text_and_save_data(ref_no, text):
     if deaths_by_day:
         info['deaths_by_day'] = deaths_by_day
         if not new_deaths:
-            new_deaths = sum(list(map(
-                lambda datum: datum['deaths'],
-                deaths_by_day,
-            )))
+            new_deaths = sum(
+                list(
+                    map(
+                        lambda datum: datum['deaths'],
+                        deaths_by_day,
+                    )
+                )
+            )
     if deaths_by_age_and_gender:
         info['deaths_by_age_and_gender'] = deaths_by_age_and_gender
         if not new_deaths:
-            new_deaths = sum(list(map(
-                lambda datum: datum['deaths'],
-                deaths_by_age_and_gender,
-            )))
+            new_deaths = sum(
+                list(
+                    map(
+                        lambda datum: datum['deaths'],
+                        deaths_by_age_and_gender,
+                    )
+                )
+            )
 
     if new_deaths:
         info['new_deaths'] = new_deaths
@@ -365,25 +400,33 @@ def parse_text_and_save_data(ref_no, text):
                     )
                     if gnds:
                         gnd = gnds[0]
-                        area_data_formatted.append({
-                            'gnd_id': gnd['id'],
-                            'gnd_name': gnd['name'],
-                        })
+                        area_data_formatted.append(
+                            {
+                                'gnd_id': gnd['id'],
+                                'gnd_name': gnd['name'],
+                            }
+                        )
                     else:
-                        area_data_formatted.append({
-                            'area_name': area,
-                        })
+                        area_data_formatted.append(
+                            {
+                                'area_name': area,
+                            }
+                        )
 
-                police_data_formatted.append({
-                    'police_area_name': police_area_name,
-                    'areas': area_data_formatted,
-                })
+                police_data_formatted.append(
+                    {
+                        'police_area_name': police_area_name,
+                        'areas': area_data_formatted,
+                    }
+                )
 
-            region_data_out_formatted.append({
-                'district_id': district_id,
-                'district_name': district_name,
-                'police_areas': police_data_formatted,
-            })
+            region_data_out_formatted.append(
+                {
+                    'district_id': district_id,
+                    'district_name': district_name,
+                    'police_areas': police_data_formatted,
+                }
+            )
         info['released_from_isolation'] = region_data_out_formatted
 
     if len(uncategorized_text_lines) > 0:

@@ -4,8 +4,10 @@ import unittest
 
 from nopdf import scrape
 
-TEST_URL = 'https://www.dgi.gov.lk' \
+TEST_URL = (
+    'https://www.dgi.gov.lk'
     + '/news/press-releases-sri-lanka/covid-19-documents'
+)
 
 
 class TestScrape(unittest.TestCase):

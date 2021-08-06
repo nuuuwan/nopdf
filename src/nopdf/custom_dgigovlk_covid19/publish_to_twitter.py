@@ -3,10 +3,10 @@ import os
 
 from utils import twitter
 
-from nopdf.custom_dgigovlk_covid19.CONSTANTS import GITHUB_TOOL_URL
 from nopdf.custom_dgigovlk_covid19.common import _get_ref_prefix, log
-from nopdf.custom_dgigovlk_covid19.render_summary_as_markdown \
-    import _get_details_lines
+from nopdf.custom_dgigovlk_covid19.CONSTANTS import GITHUB_TOOL_URL
+from nopdf.custom_dgigovlk_covid19.render_summary_as_markdown import \
+    _get_details_lines
 
 
 def _get_images(data):

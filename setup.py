@@ -24,7 +24,7 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=[
         'bs4',
-        'tweepy',
+        'tweepy==3.10.0',
         'Pillow',
         'tesseract',
         'tesseract-ocr',
